@@ -1,0 +1,495 @@
+function doenemy()
+	if (playfield[1][10].x>fieldboundmax or playfield[1][1].x<fieldboundmin) then
+		nmexmovespd=nmexmovespd*-1
+	end	
+
+	beginruntimer-=0.15
+	
+	nmecount=0	
+	
+	-- For each slot, do movement.
+	-- if the slot is not empty, get current alive nme count for random number determining attack run
+	-- if attack run true, set attack position, add nme to nmeatt collection, and check if nme fires during run
+	for r=1,#playfield do -- move enemy and roll deice for attack run
+		for c=1,#playfield[r] do
+			playfield[r][c].x+=nmexmovespd
+			playfield[r][c].nme.x=playfield[r][c].x
+			
+			if not playfield[r][c].canwrite and playfield[r][c].nme.mode==0 then	
+				nmecount+=1
+				if beginruntimer<0 and flr(rnd(nmecount*5)+1)==1 and #nmesatt<3 and playfield[r][c].nme.mode==0 and player.alive and stagetimer<=0 and gamephase==3 then
+					beginruntimer=4
+					playfield[r][c].nme.ph=rnd(1)
+					playfield[r][c].nme.mode=1
+					playfield[r][c].nme.ax=playfield[r][c].nme.x
+					playfield[r][c].nme.ay=playfield[r][c].nme.y
+					add(nmesatt,playfield[r][c].nme)
+					playfield[r][c].canwrite=true
+					sfx(6,3) -- nme attack run sound
+					doenemyfireroll(playfield[r][c].nme,true,0,70)
+				end	
+			end
+		end
+	end	
+	
+	if beginruntimer<=0 then
+		beginruntimer=4
+	end	
+	
+	-- do the attack run for nme's in the nmeatt collection
+	nmeattacking()
+	doenemyhit()
+
+	nmealive=false
+	
+	-- here we are doing the collision checks for non-attacking nme
+	-- we're also checking if any are alive for the nmeallalive flag
+	for r=1,#playfield do
+		for c=1,#playfield[r] do
+			if not playfield[r][c].canwrite and playfield[r][c].nme.mode~=2then
+				nmealive=true
+				if #rounds > 0 and (playfield[r][c].nme.mode==0 or playfield[r][c].nme.mode==1) then
+					for rds in all(rounds) do
+						if doboxcollision(playfield[r][c].nme.x,playfield[r][c].nme.y,rds.x,rds.y,nmehitboxwidth) then	
+							del(rounds,rds)
+							if playfield[r][c].nme.hp>1 then
+								playfield[r][c].nme.hp-=1
+							else
+								sfx(1,1) -- nme explode sound
+								if playfield[r][c].nme.mode==0 then
+									player.score+=nmescores[playfield[r][c].nme.typ]
+								else
+									player.score+=(nmescores[playfield[r][c].nme.typ]*4)
+								end
+								add(explosions,{x=playfield[r][c].nme.x,y=playfield[r][c].nme.y,t=1})
+								playfield[r][c].nme.mode=2
+								playfield[r][c].canwrite=true	
+								freelifecheck()
+							end
+						end		
+					end
+				end
+				drawsprite(playfield[r][c].nme,false)
+			end
+		end
+	end
+
+	doenemyhit()
+end
+
+function nmeattacking()
+	local dx
+	local dy
+	local nmeatt
+	
+	for i = #nmesatt,1,-1 do
+		nmeatt=nmesatt[i]
+		
+		if nmeatt.sw==-1 then
+			nmeatt.ph-=0.005
+			if nmeatt.ph<=0.5 then
+				--nmeatt.ph=1
+				nmeatt.sw=nmeatt.sw*-1
+			end		
+		else
+			nmeatt.ph+=0.005
+			if nmeatt.ph>=1 then
+				--nmeatt.ph=0
+				nmeatt.sw=nmeatt.sw*-1
+			end	
+		end
+		
+		nmeatt.lax=nmeatt.ax
+		nmeatt.lay=nmeatt.ay	
+		nmeatt.ax+=0.5*cos(nmeatt.ph)
+		nmeatt.ay+= nmeymovespd
+		
+		dx = (nmeatt.lax-nmeatt.ax)
+		dy = (nmeatt.lay-nmeatt.ay)
+		ang = atan2( dx, dy )
+		
+		--print(flr(atan2( dx, dy )*24),nmeatt.ax,nmeatt.ay-5,11)
+		
+		if	nmeatt.ax <fieldboundmin then
+			nmeatt.ax=fieldboundmin
+		end
+		
+		if	nmeatt.ax>fieldboundmax then
+			nmeatt.ax=fieldboundmax
+		end
+
+		
+		if nmeatt.ay>128 then
+			local col=findnextslot(nmeatt.row,nmeatt.col,true)
+	
+			local pfslot=playfield[nmeatt.row][col]
+			
+			if pfslot.canwrite then
+				nmeatt.x=pfslot.x
+				nmeatt.y=pfslot.y
+				nmeatt.ax=pfslot.x
+				nmeatt.ay=pfslot.y
+				nmeatt.mode=0
+				nmeatt.col=col
+				
+				pfslot.nme=nmeatt	
+				pfslot.canwrite=false
+			end
+			del(nmesatt,nmeatt)
+		end
+		
+		if doboxoverlapcollision(nmeatt.ax,nmeatt.ay,player.x,player.y,8) and player.alive then	
+			playerdeath()
+			destroynme(nmeatt)
+		end
+
+		
+		
+		if #rounds > 0 then
+			for r in all(rounds) do
+				if doboxcollision(nmeatt.ax,nmeatt.ay,r.x,r.y,nmehitboxwidth) then
+					--local pfslot=playfield[nmeatt.row][nmeatt.col].nmeatt
+
+					if nmeatt.hp>1 then
+						nmeatt.hp-=1
+					else
+						destroynme(nmeatt)
+					end
+				
+					del(rounds,r)
+				end
+			end
+		end
+			
+		drawrotatesprite(ang,nmeatt.ax,nmeatt.ay,nmeatt)
+		
+	end	
+end
+
+function destroynme(nme)
+	sfx(1,1) -- nme explode sound
+	player.score+=(nmescores[nme.typ]*4)
+
+	add(explosions,{x=nme.ax,y=nme.ay,t=1})
+	del(nmesatt,nme)
+	freelifecheck()	
+end
+
+function endattackrun(nmeatt, cw)
+	local col=findnextslot(nmeatt.row,nmeatt.col,true)
+	
+	if col>0 then
+		local pfslot=playfield[nmeatt.row][col]
+		
+		if pfslot.canwrite then
+			nmeatt.x=pfslot.x
+			nmeatt.y=pfslot.y
+			nmeatt.ax=pfslot.x
+			nmeatt.ay=pfslot.y
+			nmeatt.mode=0
+			nmeatt.col=col
+			
+			if not cw then
+				pfslot.nme=nmeatt	
+			end
+			
+			pfslot.canwrite=cw
+		end
+		return true
+	else
+		return false
+	end
+end
+
+function findnextslot(row,ocol,st)
+	if st then
+		if playfield[row][ocol].canwrite and playfield[row][ocol].x>=fieldboundmin and playfield[row][ocol].x<=fieldboundmax then
+			return ocol
+		end
+	end
+
+	for col=1,#playfield[row] do
+		if playfield[row][col].canwrite and playfield[row][col].x>=fieldboundmin and playfield[row][col].x<=fieldboundmax then
+			return col
+		end
+	end	
+	return -1
+end
+
+function findemptyslot(t)
+	if t==1 then
+		for n=1,16 do	
+			local r=mothslots[n][1]
+			local c=mothslots[n][2] 
+			local slot=playfield[r][c]
+
+			if slot.canwrite and slot.holdslot==false then					
+				slot.holdslot=true 
+				return slot
+			end
+		end
+	end
+
+	if t==2 then
+		for n=1,20 do	
+			local r=beeslots[n][1]
+			local c=beeslots[n][2]
+			local slot=playfield[r][c]
+
+			if slot.canwrite and slot.holdslot==false then					
+				slot.holdslot=true
+				return slot
+			end
+		end
+	end
+
+	if t==3 or t==4 then
+		for n=1,4 do	
+			local r=bossslots[n][1]
+			local c=bossslots[n][2]
+			local slot=playfield[r][c]
+
+			if slot.canwrite and slot.holdslot==false then					
+				slot.holdslot=true
+				return slot
+			end
+		end
+	end
+
+	--for r=1,#playfield do
+	--	for c=1,#playfield[r] do
+	--		local slot=playfield[r][c]
+	--		if slot.canwrite and slot.holdslot==false and slot.nme.typ==t then
+	--			slot.holdslot=true
+	--			return slot
+	--		end
+	--	end	
+	--end
+	return nil
+end
+
+function drawsprite(nme,flipy)
+	nme.t+=nmeanimspd
+	if nme.t>(3-nmeanimspd) then
+		nme.t=1
+	end
+	local fr		
+	local hp=nme.hp
+	if nme.st==0 then
+		if nme.typ==1 then
+			fr=nmetype1frames[flr(nme.t)]
+		elseif nme.typ==2 then
+			fr=nmetype2frames[flr(nme.t)]
+		elseif nme.typ==3 then
+			if hp>1 then
+				fr=nmetype3frames[flr(nme.t)]
+			else
+				fr=nmetype3frames[flr(nme.t)+2]
+			end
+		end
+	end
+	nme.f=fr
+	spr(nme.f,nme.x,nme.y,1,1,false,flipy)
+end
+
+function drawrotatesprite(ang,x,y,nme)
+	local frs={}
+
+	if nme.typ==1 then 
+		frs=nmetypeattframes[1]
+	elseif nme.typ==2 then 
+		frs=nmetypeattframes[2]
+	elseif nme.typ==3 and nme.hp==2 then 
+		frs=nmetypeattframes[3]
+	else 
+		frs=nmetypeattframes[4]
+	end
+
+	local index=flr(ang*24)+1
+	local fram={
+		{frs[7],false,true},
+		{frs[6],false,true},
+		{frs[5],false,true},
+		{frs[4],false,true},
+		{frs[3],false,true},
+		{frs[2],false,true},
+		{frs[1],true,true},
+		{frs[2],true,true},
+		{frs[3],true,true},
+		{frs[4],true,true},
+		{frs[5],true,true},
+		{frs[6],true,true},
+		{frs[7],true,false},
+		{frs[6],true,false},
+		{frs[5],true,false},
+		{frs[4],true,false},
+		{frs[3],true,false},
+		{frs[2],true,false},
+		{frs[1],false,false},
+		{frs[2],false,false},
+		{frs[3],false,false},
+		{frs[4],false,false},
+		{frs[5],false,false},
+		{frs[6],false,false}
+	}
+
+	spr(fram[index][1],x,y,1,1,fram[index][2],fram[index][3])
+	
+	--if ang>=0 and ang<15    then spr(frs[7],x,y,1,1,false,true)
+	--elseif ang>=15 and ang<30   then spr(frs[6],x,y,1,1,false,true)
+	--elseif ang>=30 and ang<45   then spr(frs[5],x,y,1,1,false,true)
+	--elseif ang>=45 and ang<60   then spr(frs[4],x,y,1,1,false,true)
+	--elseif ang>=60 and ang<75   then spr(frs[3],x,y,1,1,false,true)
+	--elseif ang>=75 and ang<90   then spr(frs[2],x,y,1,1,false,true)
+	--elseif ang>=90 and ang<105  then spr(frs[1],x,y,1,1,true,true)
+	--elseif ang>=105 and ang<120 then spr(frs[2],x,y,1,1,true,true)
+	--elseif ang>=120 and ang<135 then spr(frs[3],x,y,1,1,true,true)
+	--elseif ang>=135 and ang<150 then spr(frs[4],x,y,1,1,true,true)
+	--elseif ang>=150 and ang<165 then spr(frs[5],x,y,1,1,true,true)
+	--elseif ang>=165 and ang<180 then spr(frs[6],x,y,1,1,true,true)
+	--elseif ang>=180 and ang<195 then spr(frs[7],x,y,1,1,true,false)
+	--elseif ang>=195 and ang<210 then spr(frs[6],x,y,1,1,true,false)
+	--elseif ang>=210 and ang<225 then spr(frs[5],x,y,1,1,true,false)
+	--elseif ang>=225 and ang<240 then spr(frs[4],x,y,1,1,true,false)
+	--elseif ang>=240 and ang<255 then spr(frs[3],x,y,1,1,true,false)
+	--elseif ang>=255 and ang<270 then spr(frs[2],x,y,1,1,true,false)
+	--elseif ang>=270 and ang<285 then spr(frs[1],x,y,1,1,false,false)
+	--elseif ang>=285 and ang<300 then spr(frs[2],x,y,1,1,false,false)
+	--elseif ang>=300 and ang<315 then spr(frs[3],x,y,1,1,false,false)
+	--elseif ang>=315 and ang<330 then spr(frs[4],x,y,1,1,false,false)
+	--elseif ang>=330 and ang<345 then spr(frs[5],x,y,1,1,false,false)
+	--elseif ang>=345 and ang<360   then spr(frs[6],x,y,1,1,false,false)
+	--else print("should never exist",64,64,7) end	
+	
+end
+
+function dowave()
+	local cyclespersegment=15
+	for i=#twave,1,-1 do
+		local fromnode
+		local tonode
+		local nme=twave[i]
+		local dist
+		local dx
+		local dy
+		local disttonext
+		local maxnodes=0
+		local path={}
+
+		-- do paths generation here.
+		
+		
+		path=fetchpath(nme.path)
+		maxnodes=#path
+		
+		if nme.st==0 then
+			nme.st=1			
+			fromnode=path[nme.index]
+			
+			if nme.index==maxnodes then
+				local slot=findemptyslot(nme.typ) 
+				
+				if slot ~= nil then
+					nme.col=slot.col
+					nme.row=slot.row
+					tonode={x=slot.x,y=slot.y}
+				else 
+					tonode=path[nme.index]
+				end
+			else 
+				tonode=path[nme.index+1]
+			end
+			
+			nme.ph = atan2( (fromnode.x-tonode.x), (fromnode.y-tonode.y) )
+			nme.x=fromnode.x
+			nme.y=fromnode.y
+			nme.ax=tonode.x
+			nme.ay=tonode.y
+		else 
+			dx=nme.ax-nme.x
+			dy=nme.ay-nme.y
+		
+			dist = sqrt(dx*dx + dy*dy)
+		
+			vx=dx/dist * nmewavespd
+			vy=dy/dist * nmewavespd
+			
+			nme.x+=vx
+			nme.y+=vy
+		end
+
+		disttonext = (abs(nme.x-nme.ax)+abs(nme.y-nme.ay)) 
+
+		if disttonext<nmewavespd then
+			nme.index+=1
+			nme.st=0
+		end
+		
+		if nme.index>maxnodes then
+			
+			local slot=playfield[nme.row][nme.col]
+
+			nme.x=slot.x
+			nme.y=slot.y
+			nme.ax=slot.x
+			nme.ay=slot.y
+
+			nme.mode=0
+
+			slot.nme = nme
+			slot.canwrite=false
+			slot.holdslot=false
+
+			del(twave,nme)
+			nmewavenmes-=1
+		end
+		
+		if #rounds > 0 and nme.mode==3 then
+			for r in all(rounds) do
+				if doboxcollision(nme.x,nme.y,r.x,r.y,nmehitboxwidth) then
+					--printh("nme.mode:" .. nme.mode, logfile)
+					del(rounds,r)
+					if nme.hp>1 then
+						nme.hp-=1
+					else
+						sfx(1,1) -- nme explode sound
+						player.score+=(nmescores[nme.typ]*4)
+
+						add(explosions,{x=nme.x,y=nme.y,t=1})
+						freelifecheck()		
+						del(twave,nme)
+						nmewavenmes-=1
+						nme.mode=2
+
+						if nme.row>0 and nme.col>0 then
+							local slot=playfield[nme.row][nme.col]	
+							slot.holdslot=false
+						end
+					end
+				end
+			end
+		end
+		if stage>1 then
+			doenemyfireroll(nme,false,40,60)
+		end
+
+		if nme.mode==3 then
+			drawrotatesprite(nme.ph,nme.x,nme.y,nme)
+		end	
+	end
+end
+
+function doenemyfireroll(nme,st,min,max)
+	local rndm=rnd(4)
+	if flr((rndm==1 or rndm==2 or rndm==3)) and player.alive and #nmerounds<7 and (nme.y>min and nme.y<max) and (firesduringwave<maxfiresperwave or st) then
+		local dx = (player.x+3) - nme.x
+		local dy = (player.y+2) - nme.y
+
+		local dist = sqrt(dx*dx + dy*dy)
+		local velx = (dx / dist) * missilemovespd
+		local vely = (dy / dist) * missilemovespd
+		
+		add(nmerounds,{x=nme.x,y=nme.y,vx=velx,vy=vely,tx=player.x,ty=player.y})
+		firesduringwave+=1
+	end
+end

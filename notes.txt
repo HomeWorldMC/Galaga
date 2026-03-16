@@ -1,0 +1,82 @@
+Stages 1–3     Pattern Set A
+Stages 4–6     Pattern Set B (with transforms)
+Stages 7–9     Pattern Set C
+Stages 10–12   Pattern Set D
+Then repeat faster
+
+Challenging Stages
+8 distinct challenge stage layouts
+
+each has 5 waves of 8 enemies
+
+--------- Basic patterns
+
+Left spiral → formation
+
+Right spiral → formation
+
+Bottom loop → formation
+
+Mirror bottom loop
+
+Large figure-8 entrance
+
+Escort patterns
+6. Boss + 2 guards sweeping arc
+7. Boss + guards mirrored arc
+
+Late-stage variants
+8. Double loop
+9. Reverse spiral
+10. Wide S-curve
+
+Most stages just reuse these paths but change:
+
+enemy type
+
+spawn side
+
+timing offset
+
+mirror direction
+
+
+Stage 1
+    Wave 1
+        2x
+            Moth x4 on path "1b" -- 1=moth
+            Bee x4 on path  "1a" -- 2=bee
+    Wave 2
+        1x
+            Boss x4 on path "2b"
+            Moth x4 on path "2b" 
+    Wave 3
+        1x
+            Moth x8 on path "2a"
+    Wave 4
+        1x
+            Bee x8 on path "1b"
+    Wave 5
+        1x
+            Bee x8 on path "1a"
+
+Stage 2
+    Wave 1
+        2x
+            Moth x4 on path "1b" 
+            Bee x4 on path  "1a" 
+    Wave 2
+        2x
+            Boss x4 on path "3a"
+            Moth x4 on path "4a" 
+    Wave 3
+        2x
+            Moth x4 on path "3b"
+            Moth x4 on path "4b" 
+
+
+wd2={
+		{{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"}},
+		{{3,2,"3a"},{1,1,"4a"},{3,2,"3a"},{1,1,"4a"},{3,2,"3a"},{1,1,"4a"},{3,2,"3a"},{1,1,"4a"}},
+		{{1,1,"3b"},{1,1,"4b"},{1,1,"3b"},{1,1,"4b"},{1,1,"3b"},{1,1,"4b"},{1,1,"3b"},{1,1,"4b"}}		
+	}

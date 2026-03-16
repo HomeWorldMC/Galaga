@@ -1,0 +1,16 @@
+--function donmeexplosions()
+--	remove={}
+--	for n=#nmeexplosions,1,-1 do
+--	--for expl in all(nmeexplosions) do
+--		spr(nmeexplosionsframes[flr(nmeexplosions[n].t)],nmeexplosions[n].x,nmeexplosions[n].y)
+--		nmeexplosions[n].t+=nmeexplosionspd
+--		if nmeexplosions[n].t>(6-nmeexplosionspd) then
+--			--add(remove,nmeexplosions[n])
+--			del(nmeexplosions,nmeexplosions[n])
+--		end
+--	end
+--	
+--	--for r in all(remove) do
+--	--	del(nmeexplosions,r)
+--	--end
+--end

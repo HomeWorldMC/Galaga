@@ -371,7 +371,7 @@ end
 
 function startgame()
 	--sfx(4,0) -- start game sound
-	music(3)
+	music(1)
 	
 	player={x=63,y=112,lives=2,alive=true,t=0,f=1,animlock=1,score=0}
 	playerlifetimer=7

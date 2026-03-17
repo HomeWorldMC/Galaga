@@ -387,13 +387,17 @@ function dowave()
 			fromnode=path[nme.index]
 			
 			if nme.index==maxnodes then
-				local slot=findemptyslot(nme.typ) 
-				
-				if slot ~= nil then
-					nme.col=slot.col
-					nme.row=slot.row
-					tonode={x=slot.x,y=slot.y}
-				else 
+				if not ischallengingstage then
+					local slot=findemptyslot(nme.typ) 
+					
+					if slot ~= nil then
+						nme.col=slot.col
+						nme.row=slot.row
+						tonode={x=slot.x,y=slot.y}
+					else 
+						tonode=path[nme.index]
+					end
+				else
 					tonode=path[nme.index]
 				end
 			else 
@@ -426,19 +430,23 @@ function dowave()
 		end
 		
 		if nme.index>maxnodes then
+			if not ischallengingstage then
+				
+				local slot=playfield[nme.row][nme.col]
+
+				nme.x=slot.x
+				nme.y=slot.y
+				nme.ax=slot.x
+				nme.ay=slot.y
+
+				nme.mode=0
+
+				slot.nme = nme
+				slot.canwrite=false
+				slot.holdslot=false
+			else
 			
-			local slot=playfield[nme.row][nme.col]
-
-			nme.x=slot.x
-			nme.y=slot.y
-			nme.ax=slot.x
-			nme.ay=slot.y
-
-			nme.mode=0
-
-			slot.nme = nme
-			slot.canwrite=false
-			slot.holdslot=false
+			end
 
 			del(twave,nme)
 			nmewavenmes-=1
@@ -470,7 +478,9 @@ function dowave()
 			end
 		end
 		if stage>1 then
-			doenemyfireroll(nme,false,40,60)
+			if not ischallengingstage then
+				doenemyfireroll(nme,false,40,60)
+			end
 		end
 
 		if nme.mode==3 then

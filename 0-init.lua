@@ -2,6 +2,7 @@ function _init()
 	-- disable key repeat
 	poke(0x5f5c,255)
 	poke(0x5f5d,255)
+	poke(0x5f2e, 1)
 	
 	-- Constants	
 	pi=3.141592
@@ -33,6 +34,8 @@ function _init()
 	nmexmovespd=0.15
 	nmeymovespd=0.85
 	missilemovespd=1.55
+
+	ischallengingstage=false
 	
 	shipspeedx=1.25
 
@@ -44,8 +47,9 @@ function _init()
 
 	wrv={2,1,1,1,1}
 	wrv2={2,2,2,2,2}
+	
 
-	wd={
+	wd1={
 		{{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"}},
 		{{3,2,"2b"},{1,1,"2b"},{3,2,"2b"},{1,1,"2b"},{3,2,"2b"},{1,1,"2b"},{3,2,"2b"},{1,1,"2b"}},
 		{{1,1,"2a"},{1,1,"2a"},{1,1,"2a"},{1,1,"2a"},{1,1,"2a"},{1,1,"2a"},{1,1,"2a"},{1,1,"2a"}},
@@ -60,13 +64,42 @@ function _init()
 		{{2,1,"1a"},{2,1,"5a"},{2,1,"1a"},{2,1,"5a"},{2,1,"1a"},{2,1,"5a"},{2,1,"1a"},{2,1,"5a"}},
 		{{2,1,"1b"},{2,1,"5b"},{2,1,"1b"},{2,1,"5b"},{2,1,"1b"},{2,1,"5b"},{2,1,"1b"},{2,1,"5b"}}
 	}
+
+    wd3={
+        {{2,1,"6a"},{2,1,"6b"},{2,1,"6a"},{2,1,"6b"},{2,1,"6a"},{2,1,"6b"},{2,1,"6a"},{2,1,"6b"}},
+        {{3,2,"7a"},{1,1,"7a"},{3,2,"7a"},{1,1,"7a"},{3,2,"7a"},{1,1,"7a"},{3,2,"7a"},{1,1,"7a"}},
+        {{2,1,"7b"},{2,1,"7b"},{2,1,"7b"},{2,1,"7b"},{2,1,"7b"},{2,1,"7b"},{2,1,"7b"},{2,1,"7b"}},
+        {{2,1,"6a"},{2,1,"6a"},{2,1,"6a"},{2,1,"6a"},{2,1,"6a"},{2,1,"6a"},{2,1,"6a"},{2,1,"6a"}},
+        {{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"}}
+	}
+
+
+	--Stage 3 - Challenging Stage
+    --Wave 1
+    --    2x
+    --        Bees x4 - "6a"
+    --        Bees x4 - "6b"
+    --Wave 2
+    --    1x
+    --        Boss x4 & Bees x4 - "7a"
+    --Wave 3
+    --    1x
+    --        Bees x8 - "7b"
+    --Wave 4
+    --    1x
+    --        Bees x8 - "6a"
+    --Wave 5
+    --    1x
+    --        Bees x8 - "6b"
 	
 	paths={
 		{{x=53,y=-3},{x=56,y=7},{x=61,y=16},{x=68,y=25},{x=78,y=33},{x=110,y=60},{x=113,y=70},{x=109,y=79},{x=97,y=81},{x=90,y=76},{x=85,y=66},{x=63,y=32}},
 		{{x=127,y=114},{x=112,y=110},{x=95,y=101},{x=75,y=87},{x=68,y=75},{x=71,y=63},{x=82,y=60},{x=92,y=70},{x=88,y=83},{x=74,y=84},{x=69,y=66},{x=73,y=46}},
 		{{x=0,y=114},{x=28,y=106},{x=46,y=95},{x=60,y=80},{x=62,y=69},{x=56,y=59},{x=44,y=57},{x=33,y=65},{x=31,y=77},{x=42,y=86},{x=58,y=84},{x=63,y=71},{x=63,y=44}},
 		{{x=-3,y=106},{x=17,y=102},{x=28,y=99},{x=37,y=94},{x=45,y=88},{x=53,y=78},{x=55,y=69},{x=48,y=62},{x=38,y=66},{x=37,y=76},{x=45,y=81},{x=55,y=76},{x=55,y=44}},
-		{{x=42,y=3},{x=50,y=11},{x=54,y=20},{x=62,y=31},{x=71,y=39},{x=104,y=64},{x=106,y=70},{x=102,y=74},{x=95,y=70},{x=89,y=63},{x=57,y=39}}
+		{{x=42,y=3},{x=50,y=11},{x=54,y=20},{x=62,y=31},{x=71,y=39},{x=104,y=64},{x=106,y=70},{x=102,y=74},{x=95,y=70},{x=89,y=63},{x=57,y=39}},
+		{{x=69,y=2},{x=69,y=23},{x=67,y=45},{x=64,y=63},{x=57,y=81},{x=49,y=96},{x=35,y=106},{x=22,y=101},{x=17,y=90},{x=23,y=78},{x=38,y=71},{x=56,y=65},{x=120,y=43}},
+		{{x=0,y=114},{x=17,y=113},{x=30,y=111},{x=44,y=105},{x=61,y=95},{x=70,y=88},{x=76,y=77},{x=77,y=64},{x=76,y=49},{x=68,y=46},{x=64,y=55},{x=64,y=68},{x=65,y=77},{x=70,y=82}}
 	}
 
 	--{{x=0,y=114},{x=28,y=106},{x=46,y=95},{x=60,y=80},{x=62,y=69},{x=56,y=59},{x=44,y=57},{x=33,y=65},{x=31,y=77},{x=42,y=86},{x=58,y=84},{x=63,y=71},{x=63,y=44}},
@@ -92,12 +125,13 @@ function _init()
 	maxfiresperwave=2
 	musicstate=-1
 	jankymusictimer=0
+	pausetimer=2
 
 	initialisestars()
 end
 
 function _update60()
-	cls(0)
+
 	musicstate=stat(24)
 
 	if musicstate==3 then
@@ -148,27 +182,34 @@ function _update60()
 		else
 			if not player.alive then -- player died during wave attack. move to game phase 5 (player respawn)
 				gamephase=5
-				stagetimer=6
+				stagetimer=9
 				lastgamephase=2
 			end
 		end
-	
-		wavetimer-=0.35
-		if wavetimer<=0 and wavecounter<=#nmewavequeue then	
-			local wave=nmewavequeue[wavecounter]
-			if wave[2] ~= nil and #wave[2]>0 then	
-				for i=1,wave[1] do
-					local nme=wave[2][1]
-					add(twave, nme)
-					del(wave[2],nme)
+		pausetimer-=0.1
+		if pausetimer<=0 then
+			wavetimer-=0.35
+			if wavetimer<=0 and wavecounter<=#nmewavequeue then	
+				local wave=nmewavequeue[wavecounter]
+				if wave[2] ~= nil and #wave[2]>0 then	
+					for i=1,wave[1] do
+						local nme=wave[2][1]
+						add(twave, nme)
+						del(wave[2],nme)
+					end
+					wavetimer=3				
 				end
-				wavetimer=3				
-			end
-			if #twave<=0 then
-				wavecounter+=1
-				firesduringwave=0
-			end
-		end			
+				if #twave<=0 then
+					wavecounter+=1
+					firesduringwave=0
+					if ischallengingstage then
+						pausetimer=0.5
+					else
+						pausetimer=3	
+					end
+				end
+			end	
+		end	
 	end
 
 	----------------- game phase 3 -----------------
@@ -179,21 +220,31 @@ function _update60()
 			if #nmesatt==0 then
 				if not nmealive then
 					if player.alive  then -- all waves and formations cleared. move to next stage
-						gamephase=4
-						stagetimer=6
+						gamephase=4						
 						stage+=1
 						rounds={}
 						nmerounds={}
-						fire=0	
-						sfx(5,3)
+						fire=0
+						if stage%3==0 then
+							ischallengingstage=true
+							nmewavespd=1.45
+							stagetimer=15
+							music(4)
+						else
+							ischallengingstage=false
+							nmewavespd=1.75
+							stagetimer=9
+							sfx(5,3)
+						end
+						
 					else
 						gamephase=5
-						stagetimer=6
+						stagetimer=9
 					end
 				else
 					if not player.alive then -- player died during formation attack. move to game phase 5 (player respawn)
 						gamephase=5
-						stagetimer=6
+						stagetimer=8
 					end
 				end
 			end
@@ -207,7 +258,7 @@ function _update60()
 			getshieldnumbers()
 		else
 			wavesetval+=1
-			if wavesetval>2 then
+			if wavesetval>3 then
 				wavesetval=1
 			end
 			gamephase=1
@@ -231,9 +282,15 @@ function _update60()
 end
 	
 function _draw()
+	cls(0)
+
+	--for i=1,15 do
+		--pal(i,i+128,1)
+	--end
+	
 	dostarfield()
 
-	--print("stat(24)): " .. tostr(stat(24)), 5,90,11)
+	--print("stage: " .. stage, 5,90,11)
 	--print("jankymusictimer " .. jankymusictimer, 5,100,11)
 	--if nmesatt~=nil then
 	--	print("#nmesatt: " .. #nmesatt, 5,90,11)
@@ -250,12 +307,17 @@ function _draw()
 	end		
 	
 	if gamephase==1 or gamephase==4 then
-		print("stage " .. stage,50,64,7)
+		if ischallengingstage then
+			print("challenging stage",30,64,12) -- 68  (128-68)/2 = 60/2 = 30
+		else
+			print("stage " .. stage,50,64,12)
+		end		
 	end
 	
 	if gamephase>=2 then	
 		doenemy()
 		dowave()
+
 		if gamephase~=5 then
 			doplayer()
 		end
@@ -309,7 +371,7 @@ end
 
 function startgame()
 	--sfx(4,0) -- start game sound
-	music(1)
+	music(3)
 	
 	player={x=63,y=112,lives=2,alive=true,t=0,f=1,animlock=1,score=0}
 	playerlifetimer=7
@@ -362,16 +424,20 @@ function initialisestage()
 		local waveset={}
 		for i=1,8 do
 			if wavesetval==1 then		
-				nme={x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wd[n][i][1],t=1,ph=0,sw=flr(rnd(2)) * 2 - 1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=wd[n][i][2],path=wd[n][i][3],index=1}	
-			else
+				nme={x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wd1[n][i][1],t=1,ph=0,sw=flr(rnd(2)) * 2 - 1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=wd1[n][i][2],path=wd1[n][i][3],index=1}	
+			elseif wavesetval==2 then		
 				nme={x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wd2[n][i][1],t=1,ph=0,sw=flr(rnd(2)) * 2 - 1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=wd2[n][i][2],path=wd2[n][i][3],index=1}	
+			else		
+				nme={x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wd3[n][i][1],t=1,ph=0,sw=flr(rnd(2)) * 2 - 1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=wd3[n][i][2],path=wd3[n][i][3],index=1}
 			end
 			add(waveset,nme)
 		end
 		if wavesetval==1 then	
 			add(nmewavequeue, {wrv[n],waveset})
-		else
+		elseif wavesetval==2 then	
 			add(nmewavequeue, {wrv2[n],waveset})
+		else
+			add(nmewavequeue, {wrv[n],waveset})
 		end
 	end
 	nmewavenmes=40

@@ -21,6 +21,8 @@ function _init()
 	typ={3,1,1,2,2}
 	hp={2,1,1,1,1}
 
+	logo={192,193,194,195,196,197,198,199,208,209,210,211,212,213,214,215,224,225,226,227,228,229,230,231}
+
 	font={a=192,b=193,c=194,d=195,e=196,f=197,g=198,h=199,i=200,j=201,k=202,l=203,m=204,n=205,o=206,p=207,q=208,r=209,s=210,t=211,u=212,v=213,w=214,x=215,y=216,z=217}
 	font["0"]=218
 	font["1"]=219
@@ -89,6 +91,8 @@ function _init()
 	
 	playfieldnmes=0
 
+	textcol=6
+
 	wd1={
 		{{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"}},
 		{{3,2,"2b"},{1,1,"2b"},{3,2,"2b"},{1,1,"2b"},{3,2,"2b"},{1,1,"2b"},{3,2,"2b"},{1,1,"2b"}},
@@ -113,25 +117,6 @@ function _init()
         {{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"}}
 	}
 
-
-	--Stage 3 - Challenging Stage
-    --Wave 1
-    --    2x
-    --        Bees x4 - "6a"
-    --        Bees x4 - "6b"
-    --Wave 2
-    --    1x
-    --        Boss x4 & Bees x4 - "7a"
-    --Wave 3
-    --    1x
-    --        Bees x8 - "7b"
-    --Wave 4
-    --    1x
-    --        Bees x8 - "6a"
-    --Wave 5
-    --    1x
-    --        Bees x8 - "6b"
-	
 	paths={
 		{{x=53,y=-3},{x=56,y=7},{x=61,y=16},{x=68,y=25},{x=78,y=33},{x=110,y=60},{x=113,y=70},{x=109,y=79},{x=97,y=81},{x=90,y=76},{x=85,y=66},{x=63,y=32}},
 		{{x=127,y=114},{x=112,y=110},{x=95,y=101},{x=75,y=87},{x=68,y=75},{x=71,y=63},{x=82,y=60},{x=92,y=70},{x=88,y=83},{x=74,y=84},{x=69,y=66},{x=73,y=46}},
@@ -344,7 +329,9 @@ function _draw()
 	cls(0)
 
 	--for i=1,15 do
-		--pal(i,i+128,1)
+	--	if i~=7 and i~=10 then
+	--		--pal(i,i+128,1)
+	--	end
 	--end
 	
 	dostarfield()
@@ -365,19 +352,32 @@ function _draw()
 	--sprint("stage",35,25)
 	
 	if gamephase==0 then
+		local xoff=0
+		local yoff=0
+		for li=1,#logo do			
+			spr(logo[li],32+xoff,20+yoff)
+			xoff+=8
+			if xoff>=64 then
+				xoff=0
+				yoff+=8
+			end
+		end
+		print("rEMADE",49,39,13)
+		print("bY",58,45,13)
+		print("tEX",67,45,13)
 		if firsttime then
-			print("[press start to play]", 22,70,7)
+			print("[press start to play]", 22,100,textcol)
 		else
-			print("game over", 45,63,7)
-			print("[press start to play again]", 10,70,7)
+			print("game over", 45,93,textcol)
+			print("[press start to play again]", 10,100,textcol)
 		end		
 	end		
 	
 	if gamephase==1 or gamephase==4 then
 		if ischallengingstage then
-			print("challenging stage",30,64,12) -- 68  (128-68)/2 = 60/2 = 30
+			print("challenging stage",30,64,textcol) -- 68  (128-68)/2 = 60/2 = 30
 		else
-			print("stage " .. stage,50,64,12)
+			print("stage " .. stage,50,64,textcol)
 			--sprint("stage ",35,64,12)
 		end		
 	end
@@ -385,14 +385,14 @@ function _draw()
 	if gamephase==2 and not ischallengingstage then
 
 		if musicstate>=5 then
-			print("number of hits ", 30,63,12)
+			print("number of hits ", 30,63,textcol)
 		end
 
 		if musicstate>=6 then
 			if stagekills==40 then
-				print("perfect !",46,49,8)
+				print("perfect !",46,49,textcol)
 			end
-			print(stagekills, 90,63,12)
+			print(stagekills, 90,63,textcol)
 		end
 		
 		if musicstate==7 then
@@ -407,7 +407,7 @@ function _draw()
 				bonusflag=false
 			end
 			if stagekills<40 then
-				print("bonus " .. (bon), 44,77,12)
+				print("bonus " .. (bon), 44,77,textcol)
 			else
 				print("special bonus " .. (bon) .. " pts", 22,77,10)
 			end

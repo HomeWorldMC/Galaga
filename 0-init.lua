@@ -1,7 +1,6 @@
 function _init()
 	-- disable key repeat
-	poke(0x5f5c,255)
-	poke(0x5f5d,255)
+	
 	--poke(0x5f2e, 1)
 	
 	-- Constants	
@@ -9,6 +8,15 @@ function _init()
 	logfile="galaga/log.txt"
 
 	invince=false
+	if invince then
+		maxrounds=5
+		musicstart=3
+	else
+		maxrounds=2
+		musicstart=1
+		poke(0x5f5c,255)
+		poke(0x5f5d,255)
+	end
 		
 	typ={3,1,1,2,2}
 	hp={2,1,1,1,1}
@@ -159,6 +167,7 @@ function _init()
 	jankymusictimer=0
 	pausetimer=2
 	stagekills=0
+	bon=0
 
 	initialisestars()
 end
@@ -277,7 +286,7 @@ function _update60()
 						playfieldnmes=0
 						if stage%3==0 then
 							ischallengingstage=true
-							nmewavespd=1.45
+							nmewavespd=1.25
 							stagetimer=15
 							music(4)
 						else
@@ -380,14 +389,27 @@ function _draw()
 		end
 
 		if musicstate>=6 then
+			if stagekills==40 then
+				print("perfect !",46,49,8)
+			end
 			print(stagekills, 90,63,12)
 		end
 		
 		if musicstate==7 then
-			print("bonus " .. (stagekills*10), 44,77,12)
+			
 			if bonusflag then
-				player.score+=(stagekills*10)
+				if stagekills<40 then
+					bon=(stagekills*10)
+				else
+					bon=500
+				end				
+				player.score+=(bon)
 				bonusflag=false
+			end
+			if stagekills<40 then
+				print("bonus " .. (bon), 44,77,12)
+			else
+				print("special bonus " .. (bon) .. " pts", 22,77,10)
 			end
 		end
 	end
@@ -434,7 +456,7 @@ function controls()
 		fire=1
 	end
 	
-	if fire==1 and #rounds<2 then
+	if fire==1 and #rounds<maxrounds then
 		firelaser()
 	end
 end
@@ -449,7 +471,7 @@ end
 
 function startgame()
 	--sfx(4,0) -- start game sound
-	music(1)
+	music(musicstart)
 	
 	player={x=63,y=112,lives=2,alive=true,t=0,f=1,animlock=1,score=0}
 	playerlifetimer=7

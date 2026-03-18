@@ -11,6 +11,34 @@ function _init()
 	typ={3,1,1,2,2}
 	hp={2,1,1,1,1}
 
+	font={a=192,b=193,c=194,d=195,e=196,f=197,g=198,h=199,i=200,j=201,k=202,l=203,m=204,n=205,o=206,p=207,q=208,r=209,s=210,t=211,u=212,v=213,w=214,x=215,y=216,z=217}
+	font["0"]=218
+	font["1"]=219
+	font["2"]=220
+	font["3"]=221
+	font["4"]=222	
+	font["5"]=223
+	font["6"]=224
+	font["7"]=225
+	font["8"]=226
+	font["9"]=227
+	
+	font2={a=228,b=229,c=230,d=231,e=232,f=233,g=234,h=235,i=236,j=237,k=238,l=239,m=240,n=241,o=242,p=243,q=244,r=245,s=246,t=247,u=248,v=249,w=250,x=251,y=252,z=253}
+	font2["0"]=218
+	font2["1"]=219
+	font2["2"]=220
+	font2["3"]=221
+	font2["4"]=222	
+	font2["5"]=223
+	font2["6"]=224
+	font2["7"]=225
+	font2["8"]=226
+	font2["9"]=227
+
+	fontspaces= {1,1,1,1,0,0,1,1,0,1,1,0,1,1,2,1,1,1,0,0,1,1,1,1,0,1,-1,1,1,1,1,1,1,1,1,1}
+
+	fontspaces2={2,2,2,2,2,2,2,2,3,2,2,2,1,2,2,2,2,2,2,3,2,1,1,1,3,2,-1,1,1,1,1,1,1,1,1,1}
+
 	nmescores={5,5,20}
 	freelifescores={2000,3800,5800,8000,10400,13000,15800,18800,22000,25400,29000,32800,36800,40000}
 
@@ -98,8 +126,8 @@ function _init()
 		{{x=0,y=114},{x=28,y=106},{x=46,y=95},{x=60,y=80},{x=62,y=69},{x=56,y=59},{x=44,y=57},{x=33,y=65},{x=31,y=77},{x=42,y=86},{x=58,y=84},{x=63,y=71},{x=63,y=44}},
 		{{x=-3,y=106},{x=17,y=102},{x=28,y=99},{x=37,y=94},{x=45,y=88},{x=53,y=78},{x=55,y=69},{x=48,y=62},{x=38,y=66},{x=37,y=76},{x=45,y=81},{x=55,y=76},{x=55,y=44}},
 		{{x=42,y=3},{x=50,y=11},{x=54,y=20},{x=62,y=31},{x=71,y=39},{x=104,y=64},{x=106,y=70},{x=102,y=74},{x=95,y=70},{x=89,y=63},{x=57,y=39}},
-		{{x=69,y=2},{x=69,y=23},{x=67,y=45},{x=64,y=63},{x=57,y=81},{x=49,y=96},{x=35,y=106},{x=22,y=101},{x=17,y=90},{x=23,y=78},{x=38,y=71},{x=56,y=65},{x=120,y=43}},
-		{{x=0,y=114},{x=17,y=113},{x=30,y=111},{x=44,y=105},{x=61,y=95},{x=70,y=88},{x=76,y=77},{x=77,y=64},{x=76,y=49},{x=68,y=46},{x=64,y=55},{x=64,y=68},{x=65,y=77},{x=70,y=82}}
+		{{x=69,y=2},{x=69,y=23},{x=67,y=45},{x=64,y=63},{x=57,y=81},{x=49,y=96},{x=35,y=106},{x=22,y=101},{x=17,y=90},{x=23,y=78},{x=38,y=71},{x=56,y=65},{x=120,y=43},{x=184,y=20}},
+		{{x=0,y=114},{x=17,y=113},{x=30,y=111},{x=44,y=105},{x=61,y=95},{x=70,y=88},{x=76,y=77},{x=77,y=64},{x=76,y=49},{x=68,y=46},{x=64,y=55},{x=64,y=68},{x=65,y=77},{x=70,y=82},{x=140,y=70}}
 	}
 
 	--{{x=0,y=114},{x=28,y=106},{x=46,y=95},{x=60,y=80},{x=62,y=69},{x=56,y=59},{x=44,y=57},{x=33,y=65},{x=31,y=77},{x=42,y=86},{x=58,y=84},{x=63,y=71},{x=63,y=44}},
@@ -296,6 +324,7 @@ function _draw()
 	--	print("#nmesatt: " .. #nmesatt, 5,90,11)
 	--end	
 	--print("nmealive: " .. tostr(nmealive), 5,100,11)
+	--sprint("stage",35,25)
 	
 	if gamephase==0 then
 		if firsttime then
@@ -308,9 +337,10 @@ function _draw()
 	
 	if gamephase==1 or gamephase==4 then
 		if ischallengingstage then
-			print("challenging stage",30,64,12) -- 68  (128-68)/2 = 60/2 = 30
+			print("challenging stage",35,64,12) -- 68  (128-68)/2 = 60/2 = 30
 		else
 			print("stage " .. stage,50,64,12)
+			--sprint("stage ",35,64,12)
 		end		
 	end
 	
@@ -371,7 +401,7 @@ end
 
 function startgame()
 	--sfx(4,0) -- start game sound
-	music(1)
+	music(3)
 	
 	player={x=63,y=112,lives=2,alive=true,t=0,f=1,animlock=1,score=0}
 	playerlifetimer=7
@@ -505,5 +535,27 @@ end
 function printpath(path) -- delete me
 	for p in all(path) do
 		print("x: " .. p.x .. " y: " .. p.y)
+	end
+end
+
+function sprint(text,x,y)
+	local strsize = #text
+	local char=""
+	local sprt=0
+	local space=0
+
+	for i=1,strsize do		
+		char=sub(text,i,i)
+		
+
+		if font2[char]==nil then
+			sprt=0
+			space=0
+		else
+			sprt=font2[char]
+			space=fontspaces2[sprt-227]
+		end
+		spr(sprt,x,y)
+		x=x+8-space
 	end
 end

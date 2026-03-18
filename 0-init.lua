@@ -434,7 +434,7 @@ function controls()
 		fire=1
 	end
 	
-	if fire==1 and #rounds<5 then
+	if fire==1 and #rounds<2 then
 		firelaser()
 	end
 end

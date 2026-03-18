@@ -44,19 +44,21 @@ function resetplayer()
 end
 
 function playerdeath()
-	--sfx(2,2)  -- player explode sound
-	--player.alive=false
-	--add(explosions,{x=player.x,y=player.y,t=1})
---
-	--if player.lives<1 then
-	--	gamephase=0
-	--	gameover=true
-	--else 		
-	--	lastgamephase=gamephase
-	--	stagetimer=6
-	--end				
-	--player.animlock=false
-	--player.t=2	
+	if not invince then
+		sfx(2,2)  -- player explode sound
+		player.alive=false
+		add(explosions,{x=player.x,y=player.y,t=1})
+
+		if player.lives<1 then
+			gamephase=0
+			gameover=true
+		else 		
+			lastgamephase=gamephase
+			stagetimer=6
+		end				
+		player.animlock=false
+		player.t=2	
+	end
 end
 
 function doboxcollision(sx,sy,tx,ty,size)

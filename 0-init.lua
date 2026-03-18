@@ -2,11 +2,13 @@ function _init()
 	-- disable key repeat
 	poke(0x5f5c,255)
 	poke(0x5f5d,255)
-	poke(0x5f2e, 1)
+	--poke(0x5f2e, 1)
 	
 	-- Constants	
 	pi=3.141592
 	logfile="galaga/log.txt"
+
+	invince=false
 		
 	typ={3,1,1,2,2}
 	hp={2,1,1,1,1}
@@ -64,6 +66,7 @@ function _init()
 	missilemovespd=1.55
 
 	ischallengingstage=false
+	bonusflag=false
 	
 	shipspeedx=1.25
 
@@ -76,6 +79,7 @@ function _init()
 	wrv={2,1,1,1,1}
 	wrv2={2,2,2,2,2}
 	
+	playfieldnmes=0
 
 	wd1={
 		{{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"}},
@@ -154,6 +158,7 @@ function _init()
 	musicstate=-1
 	jankymusictimer=0
 	pausetimer=2
+	stagekills=0
 
 	initialisestars()
 end
@@ -205,7 +210,18 @@ function _update60()
 	if gamephase==2 then -- first wave attacks
 		if nmewavenmes==0 then -- all wave enemies defeated. 
 			if wavecounter==#nmewavequeue then	-- all waves completed. move to formation attack phase (game phase 3)
-				gamephase=3
+				if not ischallengingstage then
+					if musicstate < 0 then				
+						gamephase=3
+					end
+				else
+					--do challenging stage stuff here
+					if musicstate < 0 then
+						music(5)	
+						ischallengingstage=false
+						bonusflag=true
+					end
+				end
 			end
 		else
 			if not player.alive then -- player died during wave attack. move to game phase 5 (player respawn)
@@ -214,6 +230,7 @@ function _update60()
 				lastgamephase=2
 			end
 		end
+
 		pausetimer-=0.1
 		if pausetimer<=0 then
 			wavetimer-=0.35
@@ -227,11 +244,14 @@ function _update60()
 					end
 					wavetimer=3				
 				end
+
 				if #twave<=0 then
-					wavecounter+=1
+					if wavecounter~=#nmewavequeue then
+						wavecounter+=1
+					end
 					firesduringwave=0
 					if ischallengingstage then
-						pausetimer=0.5
+						pausetimer=5
 					else
 						pausetimer=3	
 					end
@@ -245,14 +265,16 @@ function _update60()
 		if stagetimer>0 then -- formation attacks
 			stagetimer-=0.1		
 		else
-			if #nmesatt==0 then
-				if not nmealive then
+			if #nmesatt==0  then
+				if not nmealive and playfieldnmes<=0 then
 					if player.alive  then -- all waves and formations cleared. move to next stage
 						gamephase=4						
 						stage+=1
 						rounds={}
 						nmerounds={}
 						fire=0
+						stagekills=0
+						playfieldnmes=0
 						if stage%3==0 then
 							ischallengingstage=true
 							nmewavespd=1.45
@@ -318,12 +340,19 @@ function _draw()
 	
 	dostarfield()
 
-	--print("stage: " .. stage, 5,90,11)
-	--print("jankymusictimer " .. jankymusictimer, 5,100,11)
+	--print("kills: " .. stagekills, 5,60,11)
+	--print("nmewavenmes " .. tostr(nmewavenmes), 5,70,11)
+	--print("playfieldnmes " .. tostr(playfieldnmes), 5,80,11)
 	--if nmesatt~=nil then
 	--	print("#nmesatt: " .. #nmesatt, 5,90,11)
 	--end	
-	--print("nmealive: " .. tostr(nmealive), 5,100,11)
+	--print("ischallengingstage: " .. tostr(ischallengingstage), 5,80,11)
+	--print("gamephase: " .. tostr(gamephase), 5,90,11)
+	--if nmewavequeue~=nil then
+		--print("#nmewavequeue: " .. #nmewavequeue, 5,100,11)
+	--end	
+	--print("#nmewavequeue: " .. #nmewavequeue, 5,100,11)
+	--print("wavecounter: " .. tostr(wavecounter), 5,110,11)
 	--sprint("stage",35,25)
 	
 	if gamephase==0 then
@@ -337,13 +366,32 @@ function _draw()
 	
 	if gamephase==1 or gamephase==4 then
 		if ischallengingstage then
-			print("challenging stage",35,64,12) -- 68  (128-68)/2 = 60/2 = 30
+			print("challenging stage",30,64,12) -- 68  (128-68)/2 = 60/2 = 30
 		else
 			print("stage " .. stage,50,64,12)
 			--sprint("stage ",35,64,12)
 		end		
 	end
-	
+
+	if gamephase==2 and not ischallengingstage then
+
+		if musicstate>=5 then
+			print("number of hits ", 30,63,12)
+		end
+
+		if musicstate>=6 then
+			print(stagekills, 90,63,12)
+		end
+		
+		if musicstate==7 then
+			print("bonus " .. (stagekills*10), 44,77,12)
+			if bonusflag then
+				player.score+=(stagekills*10)
+				bonusflag=false
+			end
+		end
+	end
+
 	if gamephase>=2 then	
 		doenemy()
 		dowave()
@@ -386,7 +434,7 @@ function controls()
 		fire=1
 	end
 	
-	if fire==1 and #rounds<2 then
+	if fire==1 and #rounds<5 then
 		firelaser()
 	end
 end

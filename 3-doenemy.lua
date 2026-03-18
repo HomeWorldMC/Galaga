@@ -25,6 +25,7 @@ function doenemy()
 					playfield[r][c].nme.ay=playfield[r][c].nme.y
 					add(nmesatt,playfield[r][c].nme)
 					playfield[r][c].canwrite=true
+					playfieldnmes-=1
 					sfx(6,3) -- nme attack run sound
 					doenemyfireroll(playfield[r][c].nme,true,0,70)
 				end	
@@ -64,7 +65,9 @@ function doenemy()
 								add(explosions,{x=playfield[r][c].nme.x,y=playfield[r][c].nme.y,t=1})
 								playfield[r][c].nme.mode=2
 								playfield[r][c].canwrite=true	
+								playfieldnmes-=1
 								freelifecheck()
+								stagekills+=1
 							end
 						end		
 					end
@@ -154,6 +157,7 @@ function nmeattacking()
 						nmeatt.hp-=1
 					else
 						destroynme(nmeatt)
+						stagekills+=1
 					end
 				
 					del(rounds,r)
@@ -444,6 +448,7 @@ function dowave()
 				slot.nme = nme
 				slot.canwrite=false
 				slot.holdslot=false
+				playfieldnmes+=1
 			else
 			
 			end
@@ -468,7 +473,7 @@ function dowave()
 						del(twave,nme)
 						nmewavenmes-=1
 						nme.mode=2
-
+						stagekills+=1
 						if nme.row>0 and nme.col>0 then
 							local slot=playfield[nme.row][nme.col]	
 							slot.holdslot=false

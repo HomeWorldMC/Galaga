@@ -379,9 +379,6 @@ function dowave()
 		local disttonext
 		local maxnodes=0
 		local path={}
-
-		-- do paths generation here.
-		
 		
 		path=fetchpath(nme.path)
 		maxnodes=#path

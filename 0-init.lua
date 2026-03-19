@@ -22,113 +22,99 @@ function _init()
 	hp={2,1,1,1,1}
 
 	logo={192,193,194,195,196,197,198,199,208,209,210,211,212,213,214,215,224,225,226,227,228,229,230,231}
-
-	font={a=192,b=193,c=194,d=195,e=196,f=197,g=198,h=199,i=200,j=201,k=202,l=203,m=204,n=205,o=206,p=207,q=208,r=209,s=210,t=211,u=212,v=213,w=214,x=215,y=216,z=217}
-	font["0"]=218
-	font["1"]=219
-	font["2"]=220
-	font["3"]=221
-	font["4"]=222	
-	font["5"]=223
-	font["6"]=224
-	font["7"]=225
-	font["8"]=226
-	font["9"]=227
-	
-	font2={a=228,b=229,c=230,d=231,e=232,f=233,g=234,h=235,i=236,j=237,k=238,l=239,m=240,n=241,o=242,p=243,q=244,r=245,s=246,t=247,u=248,v=249,w=250,x=251,y=252,z=253}
-	font2["0"]=218
-	font2["1"]=219
-	font2["2"]=220
-	font2["3"]=221
-	font2["4"]=222	
-	font2["5"]=223
-	font2["6"]=224
-	font2["7"]=225
-	font2["8"]=226
-	font2["9"]=227
-
-	fontspaces= {1,1,1,1,0,0,1,1,0,1,1,0,1,1,2,1,1,1,0,0,1,1,1,1,0,1,-1,1,1,1,1,1,1,1,1,1}
-
-	fontspaces2={2,2,2,2,2,2,2,2,3,2,2,2,1,2,2,2,2,2,2,3,2,1,1,1,3,2,-1,1,1,1,1,1,1,1,1,1}
-
 	nmescores={5,5,20}
 	freelifescores={2000,3800,5800,8000,10400,13000,15800,18800,22000,25400,29000,32800,36800,40000}
-
-	nmehitboxwidth=7
-	
+	nmehitboxwidth=7	
 	fieldboundmin=2
-	fieldboundmax=120
-	
+	fieldboundmax=120	
 	explosionsframes={3,4,5,6,7}
-	explosionspd=0.4
-	
-	stageiconsprites={8,9,10,11,12,13}
-	
+	explosionspd=0.4	
+	stageiconsprites={8,9,10,11,12,13}	
 	nmetype1frames={64,65}
 	nmetype2frames={72,73}
-	nmetype3frames={80,81,88,89}	
-
-	nmetypeattframes={{65,66,67,68,69,70,71},{73,74,75,76,77,78,79},{81,82,83,84,85,86,87},{89,90,91,92,93,94,95}}	
-
+	nmetype3frames={80,81,88,89}
+	nmetypeattframes={{65,66,67,68,69,70,71},{73,74,75,76,77,78,79},{81,82,83,84,85,86,87},{89,90,91,92,93,94,95}}
 	nmeanimspd=0.035
 	nmexmovespd=0.15
 	nmeymovespd=0.85
 	missilemovespd=1.55
 
-	ischallengingstage=false
-	bonusflag=false
-	
-	shipspeedx=1.25
-
-	wavesetval=1
-
 	beeslots={{5,5},{5,6},{4,5},{4,6},{5,4},{5,3},{4,4},{4,3},{5,7},{5,8},{4,7},{4,8},{5,2},{5,1},{4,2},{4,1},{5,9},{5,10},{4,9},{4,10}}
 	mothslots={{3,5},{3,6},{2,5},{2,6},{3,4},{3,3},{2,4},{2,3},{3,7},{3,8},{2,7},{2,8},{3,2},{2,2},{3,9},{2,9}}
 	bossslots={{1,5},{1,6},{1,4},{1,7}} 
 
-	wrv={2,1,1,1,1}
-	wrv2={2,2,2,2,2}
-	
-	playfieldnmes=0
-
 	textcol=6
 
-	wd1={
-		{{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"}},
-		{{3,2,"2b"},{1,1,"2b"},{3,2,"2b"},{1,1,"2b"},{3,2,"2b"},{1,1,"2b"},{3,2,"2b"},{1,1,"2b"}},
-		{{1,1,"2a"},{1,1,"2a"},{1,1,"2a"},{1,1,"2a"},{1,1,"2a"},{1,1,"2a"},{1,1,"2a"},{1,1,"2a"}},
-		{{2,1,"1b"},{2,1,"1b"},{2,1,"1b"},{2,1,"1b"},{2,1,"1b"},{2,1,"1b"},{2,1,"1b"},{2,1,"1b"}},
-		{{2,1,"1a"},{2,1,"1a"},{2,1,"1a"},{2,1,"1a"},{2,1,"1a"},{2,1,"1a"},{2,1,"1a"},{2,1,"1a"}}
+	waves={
+		{
+			{2,{1,2},{"1a","1b"}},
+			{1,{3,1},{"2b"}},
+			{1,{1},{"2a"}},
+			{1,{2},{"1b"}},
+			{1,{2},{"1a"}}
+		},
+		{
+			{2,{1,2},{"1a","1b"}},
+			{2,{3,1},{"3a","4a"}},
+			{2,{1,1},{"3b","4b"}},
+			{2,{2,2},{"1a","5a"}},
+			{2,{2,2},{"1b","5b"}}
+		},
+		{
+			{2,{2,2},{"6a","6b"}}, -- challenging stage
+			{1,{3,1},{"7a"}},
+			{1,{2},{"7b"}},
+			{1,{2},{"6a"}},
+			{1,{2},{"6b"}}
+		},
+		{
+			{2,{1,2},{"1a","1b"}},
+			{2,{3,1},{"2a","2b"}},
+			{2,{1,1},{"2a","2b"}},
+			{2,{2,2},{"1a","1b"}},
+			{2,{2,2},{"1a","1b"}}
+		},
+		{
+			{2,{1,2},{"1a","1b"}},
+			{2,{3,1},{"3a","4a"}},
+			{2,{1,1},{"3b","4b"}},
+			{2,{2,2},{"1b","5b"}},
+			{2,{2,2},{"1a","5a"}}
+		},
+		{
+			{2,{1,2},{"1a","1b"}},
+			{1,{3,1},{"3a","3a"}},
+			{1,{1},{"3b","3b"}},
+			{1,{2},{"1b","1b"}},
+			{1,{2},{"1a","1a"}}
+		},
+		{
+			{2,{2,2},{"6a","6b"}}, -- challenging stage
+			{1,{3,1},{"7a"}},
+			{1,{2},{"7b"}},
+			{1,{2},{"6a"}},
+			{1,{2},{"6b"}}
+		},
+		{
+			{2,{1,2},{"1a","1b"}},
+			{2,{3,1},{"2a","2b"}},
+			{2,{1,1},{"3b","4b"}},
+			{2,{2,2},{"1b","5b"}},
+			{2,{2,2},{"1a","5a"}}
+		}
 	}
 
-	wd2={
-		{{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"},{1,1,"1a"},{2,1,"1b"}},
-		{{3,2,"3a"},{1,1,"4a"},{3,2,"3a"},{1,1,"4a"},{3,2,"3a"},{1,1,"4a"},{3,2,"3a"},{1,1,"4a"}},
-		{{1,1,"3b"},{1,1,"4b"},{1,1,"3b"},{1,1,"4b"},{1,1,"3b"},{1,1,"4b"},{1,1,"3b"},{1,1,"4b"}},
-		{{2,1,"1a"},{2,1,"5a"},{2,1,"1a"},{2,1,"5a"},{2,1,"1a"},{2,1,"5a"},{2,1,"1a"},{2,1,"5a"}},
-		{{2,1,"1b"},{2,1,"5b"},{2,1,"1b"},{2,1,"5b"},{2,1,"1b"},{2,1,"5b"},{2,1,"1b"},{2,1,"5b"}}
-	}
-
-    wd3={
-        {{2,1,"6a"},{2,1,"6b"},{2,1,"6a"},{2,1,"6b"},{2,1,"6a"},{2,1,"6b"},{2,1,"6a"},{2,1,"6b"}},
-        {{3,2,"7a"},{1,1,"7a"},{3,2,"7a"},{1,1,"7a"},{3,2,"7a"},{1,1,"7a"},{3,2,"7a"},{1,1,"7a"}},
-        {{2,1,"7b"},{2,1,"7b"},{2,1,"7b"},{2,1,"7b"},{2,1,"7b"},{2,1,"7b"},{2,1,"7b"},{2,1,"7b"}},
-        {{2,1,"6a"},{2,1,"6a"},{2,1,"6a"},{2,1,"6a"},{2,1,"6a"},{2,1,"6a"},{2,1,"6a"},{2,1,"6a"}},
-        {{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"},{2,1,"6b"}}
-	}
-
+	
 	paths={
-		{{x=53,y=-3},{x=56,y=7},{x=61,y=16},{x=68,y=25},{x=78,y=33},{x=110,y=60},{x=113,y=70},{x=109,y=79},{x=97,y=81},{x=90,y=76},{x=85,y=66},{x=63,y=32}},
-		{{x=127,y=114},{x=112,y=110},{x=95,y=101},{x=75,y=87},{x=68,y=75},{x=71,y=63},{x=82,y=60},{x=92,y=70},{x=88,y=83},{x=74,y=84},{x=69,y=66},{x=73,y=46}},
-		{{x=0,y=114},{x=28,y=106},{x=46,y=95},{x=60,y=80},{x=62,y=69},{x=56,y=59},{x=44,y=57},{x=33,y=65},{x=31,y=77},{x=42,y=86},{x=58,y=84},{x=63,y=71},{x=63,y=44}},
-		{{x=-3,y=106},{x=17,y=102},{x=28,y=99},{x=37,y=94},{x=45,y=88},{x=53,y=78},{x=55,y=69},{x=48,y=62},{x=38,y=66},{x=37,y=76},{x=45,y=81},{x=55,y=76},{x=55,y=44}},
-		{{x=42,y=3},{x=50,y=11},{x=54,y=20},{x=62,y=31},{x=71,y=39},{x=104,y=64},{x=106,y=70},{x=102,y=74},{x=95,y=70},{x=89,y=63},{x=57,y=39}},
-		{{x=69,y=2},{x=69,y=23},{x=67,y=45},{x=64,y=63},{x=57,y=81},{x=49,y=96},{x=35,y=106},{x=22,y=101},{x=17,y=90},{x=23,y=78},{x=38,y=71},{x=56,y=65},{x=120,y=43},{x=184,y=20}},
-		{{x=0,y=114},{x=17,y=113},{x=30,y=111},{x=44,y=105},{x=61,y=95},{x=70,y=88},{x=76,y=77},{x=77,y=64},{x=76,y=49},{x=68,y=46},{x=64,y=55},{x=64,y=68},{x=65,y=77},{x=70,y=82},{x=140,y=70}}
+	--[[top_hairpin_left]] 	{{x=53,y=-3},{x=56,y=7},{x=61,y=16},{x=68,y=25},{x=78,y=33},{x=110,y=60},{x=113,y=70},{x=109,y=79},{x=97,y=81},{x=90,y=76},{x=85,y=66},{x=63,y=32}},
+	--[[right_loop_right]]	--{{x=127,y=114},{x=112,y=110},{x=95,y=101},{x=75,y=87},{x=68,y=75},{x=71,y=63},{x=82,y=60},{x=92,y=70},{x=88,y=83},{x=74,y=84},{x=69,y=66},{x=73,y=46}},
+							{{x=127,y=114},{x=112,y=110},{x=101,y=104},{x=81,y=90},{x=74,y=78},{x=77,y=66},{x=88,y=63},{x=98,y=73},{x=94,y=86},{x=80,y=87},{x=75,y=69},{x=79,y=49}},
+	--[[left_loop_left_outer]]	{{x=0,y=114},{x=28,y=106},{x=46,y=95},{x=60,y=80},{x=62,y=69},{x=56,y=59},{x=44,y=57},{x=33,y=65},{x=31,y=77},{x=42,y=86},{x=58,y=84},{x=63,y=71},{x=63,y=44}},
+	--[[left_loop_left_inner]]	{{x=-3,y=106},{x=17,y=102},{x=28,y=99},{x=37,y=94},{x=45,y=88},{x=53,y=78},{x=55,y=69},{x=48,y=62},{x=38,y=66},{x=37,y=76},{x=45,y=81},{x=55,y=76},{x=55,y=44}},
+	--[[top_hairpin_left_inner]]	{{x=42,y=3},{x=50,y=11},{x=54,y=20},{x=62,y=31},{x=71,y=39},{x=104,y=64},{x=106,y=70},{x=102,y=74},{x=95,y=70},{x=89,y=63},{x=57,y=39}},
+	--[[top_bowtie_right]]	{{x=69,y=2},{x=69,y=23},{x=67,y=45},{x=64,y=63},{x=57,y=81},{x=49,y=96},{x=35,y=106},{x=22,y=101},{x=17,y=90},{x=23,y=78},{x=38,y=71},{x=56,y=65},{x=120,y=43},{x=184,y=20}},
+	--[[left_centreloop_left]]	{{x=0,y=114},{x=17,y=113},{x=30,y=111},{x=44,y=105},{x=61,y=95},{x=70,y=88},{x=76,y=77},{x=77,y=64},{x=76,y=49},{x=68,y=46},{x=64,y=55},{x=64,y=68},{x=65,y=77},{x=70,y=82},{x=140,y=70}}
 	}
-
-	--{{x=0,y=114},{x=28,y=106},{x=46,y=95},{x=60,y=80},{x=62,y=69},{x=56,y=59},{x=44,y=57},{x=33,y=65},{x=31,y=77},{x=42,y=86},{x=58,y=84},{x=63,y=71},{x=63,y=44}},
-	--{{x=1,y=106},{x=17,y=102},{x=28,y=99},{x=37,y=94},{x=45,y=88},{x=53,y=78},{x=55,y=69},{x=48,y=62},{x=38,y=66},{x=37,y=76},{x=45,y=81},{x=55,y=76},{x=55,y=44}}
 
 	-- Vars
 	blink=0	
@@ -152,7 +138,12 @@ function _init()
 	jankymusictimer=0
 	pausetimer=2
 	stagekills=0
-	bon=0
+	bon=0		
+	ischallengingstage=false
+	bonusflag=false	
+	shipspeedx=1.25
+	wavesetval=1
+	playfieldnmes=0
 
 	initialisestars()
 end
@@ -269,7 +260,7 @@ function _update60()
 						fire=0
 						stagekills=0
 						playfieldnmes=0
-						if stage%3==0 then
+						if (stage+1)%4==0 then
 							ischallengingstage=true
 							nmewavespd=1.25
 							stagetimer=15
@@ -378,7 +369,6 @@ function _draw()
 			print("challenging stage",30,64,textcol) -- 68  (128-68)/2 = 60/2 = 30
 		else
 			print("stage " .. stage,50,64,textcol)
-			--sprint("stage ",35,64,12)
 		end		
 	end
 
@@ -390,7 +380,7 @@ function _draw()
 
 		if musicstate>=6 then
 			if stagekills==40 then
-				print("perfect !",46,49,textcol)
+				print("perfect !",46,49,8)
 			end
 			print(stagekills, 90,63,textcol)
 		end
@@ -401,7 +391,7 @@ function _draw()
 				if stagekills<40 then
 					bon=(stagekills*10)
 				else
-					bon=500
+					bon=1000
 				end				
 				player.score+=(bon)
 				bonusflag=false
@@ -492,7 +482,6 @@ function initialisestage()
 	nmealive=true
 	nmecount=40
 	beginruntimer=0
-	--freelivesgiven=1
 	lastgamephase=2	
 	playfield={}
 	numshields={}	
@@ -519,28 +508,48 @@ function initialisestage()
 	end	
 
 	-- Create first wave nmes, add to wave set, then add wave set to wave queue
-	local nme={}
+	--local nme={}
+	local ws=1
 	for n=1,5 do
-		local waveset={}
-		for i=1,8 do
-			if wavesetval==1 then		
-				nme={x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wd1[n][i][1],t=1,ph=0,sw=flr(rnd(2)) * 2 - 1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=wd1[n][i][2],path=wd1[n][i][3],index=1}	
-			elseif wavesetval==2 then		
-				nme={x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wd2[n][i][1],t=1,ph=0,sw=flr(rnd(2)) * 2 - 1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=wd2[n][i][2],path=wd2[n][i][3],index=1}	
-			else		
-				nme={x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wd3[n][i][1],t=1,ph=0,sw=flr(rnd(2)) * 2 - 1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=wd3[n][i][2],path=wd3[n][i][3],index=1}
-			end
-			add(waveset,nme)
-		end
-		if wavesetval==1 then	
-			add(nmewavequeue, {wrv[n],waveset})
-		elseif wavesetval==2 then	
-			add(nmewavequeue, {wrv2[n],waveset})
-		else
-			add(nmewavequeue, {wrv[n],waveset})
-		end
+		ws=stage%#waves
+		if ws==0 then ws=#waves end
+		buildstagenmewaves(waves[ws][n])
 	end
 	nmewavenmes=40
+end
+
+function buildstagenmewaves(wav)
+	-- Wave construction rules
+	---- 1. If a wave has 2 nme paths, it WILL have 2 distinct path values - e.g. {"1a", "1b"}.
+	---- 2. If it has 2 nme paths, 2 nme types will be provided. Even if the types are the same - e.g. {1,1}.
+	---- 3. A wave with 2 paths will always have 4 ships per path
+
+	---{2,{1,2},{"1a","1b"}},
+	---{1,{3,1},{"3a","3a"}},
+	---{1,{1},{"3b","3b"}},
+	---{1,{2},{"1b","1b"}},
+	---{1,{2},{"1a","1a"}}
+
+	local wavset={}
+	local hp=1
+
+	ntindex=1
+	ptindex=1
+
+	if wav[1]==1 then nw=1 else nw=2 end
+	for i=1,(8/wav[1]) do			
+		if wav[2][ntindex]==3 then hp=2 else hp=1 end
+		
+		for nw=1, wav[1] do
+			add(wavset,{x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wav[2][ntindex],t=1,ph=0,sw=flr(rnd(2))*2-1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=hp,path=wav[3][ptindex],index=1})
+			
+			ntindex+=1
+			ptindex+=1
+			if ntindex>#wav[2] then ntindex=1 end
+			if ptindex>#wav[3] then ptindex=1 end
+		end
+	end
+	add(nmewavequeue, {wav[1],wavset})
 end
 
 function resetvars() 
@@ -602,30 +611,30 @@ function flippath(path)
 	return flippedpath
 end
 
-function printpath(path) -- delete me
-	for p in all(path) do
-		print("x: " .. p.x .. " y: " .. p.y)
-	end
-end
+--function printpath(path) -- delete me
+--	for p in all(path) do
+--		print("x: " .. p.x .. " y: " .. p.y)
+--	end
+--end
 
-function sprint(text,x,y)
-	local strsize = #text
-	local char=""
-	local sprt=0
-	local space=0
-
-	for i=1,strsize do		
-		char=sub(text,i,i)
-		
-
-		if font2[char]==nil then
-			sprt=0
-			space=0
-		else
-			sprt=font2[char]
-			space=fontspaces2[sprt-227]
-		end
-		spr(sprt,x,y)
-		x=x+8-space
-	end
-end
+--function sprint(text,x,y)
+--	local strsize = #text
+--	local char=""
+--	local sprt=0
+--	local space=0
+--
+--	for i=1,strsize do		
+--		char=sub(text,i,i)
+--		
+--
+--		if font2[char]==nil then
+--			sprt=0
+--			space=0
+--		else
+--			sprt=font2[char]
+--			space=fontspaces2[sprt-227]
+--		end
+--		spr(sprt,x,y)
+--		x=x+8-space
+--	end
+--end

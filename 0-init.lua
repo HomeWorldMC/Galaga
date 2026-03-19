@@ -1,7 +1,58 @@
+function drawtractorbeam(offx,offy)
+	for i in all(tractorsprites) do
+		spr(i.spr,i.x+offx,i.y+offy)
+	end	
+
+
+	local c1=tcols1[flr(tcol)]
+	local c2=tcols2[flr(tcol)]
+	local c3=tcols3[flr(tcol)]
+
+	tcol+=0.2
+	if tcol>3.8 then tcol=1 end
+
+
+	pal(2,c1,1)
+	pal(11,c2,1)
+	pal(15,c3,1)
+
+	rectfill(offx,offy+trmov,offx+24,offy+40,0)
+	trmov+=0.2*trdir
+	if trmov>40  then trdir=-1 end
+	if trmov<5  then trdir=1 end
+end
+
 function _init()
 	-- disable key repeat
 	
 	--poke(0x5f2e, 1)
+
+	--spare colors 15,2,11
+
+	--tractor sprites
+	tractorsprites={
+			{spr=128,x=0,y=0},
+			{spr=129,x=8,y=0},
+			{spr=130,x=16,y=0},
+
+			{spr=144,x=0,y=8},
+			{spr=145,x=8,y=8},
+			{spr=146,x=16,y=8},
+
+			{spr=160,x=0,y=16},
+			{spr=161,x=8,y=16},
+			{spr=162,x=16,y=16},
+
+			{spr=176,x=0,y=24},
+			{spr=177,x=8,y=24},
+			{spr=178,x=16,y=24},
+
+			{spr=131,x=0,y=32},
+			{spr=132,x=8,y=32},
+			{spr=133,x=16,y=32}
+		}
+
+
 	
 	-- Constants	
 	pi=3.141592
@@ -144,6 +195,14 @@ function _init()
 	shipspeedx=1.25
 	wavesetval=1
 	playfieldnmes=0
+
+	tcols1={1,3,12}
+	tcols2={12,1,3}
+	tcols3={3,12,1}
+	tcol=1
+
+	trmov=55
+	trdir=40
 
 	initialisestars()
 end
@@ -324,6 +383,8 @@ function _draw()
 	--		--pal(i,i+128,1)
 	--	end
 	--end
+	
+	drawtractorbeam(52,55)	
 	
 	dostarfield()
 

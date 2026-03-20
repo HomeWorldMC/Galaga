@@ -378,7 +378,7 @@ function _draw()
 	
 	dostarfield()
 
-	print("triedcapturethisstage: " .. tostr(triedcapturethisstage), 5,00,11)
+	--print("triedcapturethisstage: " .. tostr(triedcapturethisstage), 5,00,11)
 	--print("nmewavenmes " .. tostr(nmewavenmes), 5,70,11)
 	--print("playfieldnmes " .. tostr(playfieldnmes), 5,80,11)
 	--if nmesatt~=nil then

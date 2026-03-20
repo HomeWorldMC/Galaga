@@ -315,7 +315,7 @@ function drawrotatesprite(ang,x,y,nme)
 		frs=nmetypeattframes[1]
 	elseif nme.typ==2 then 
 		frs=nmetypeattframes[2]
-	elseif nme.typ==3 and nme.hp==2 then 
+	elseif nme.typ==3 and nme.hp==2 then
 		frs=nmetypeattframes[3]
 	else 
 		frs=nmetypeattframes[4]

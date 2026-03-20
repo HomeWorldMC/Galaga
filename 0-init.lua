@@ -35,7 +35,7 @@ function _init()
 	logfile="log.txt"
 	printh("","log.txt",true)
 
-	invince=false
+	invince=true
 	if invince then
 		maxrounds=5
 		musicstart=3
@@ -184,6 +184,10 @@ function _init()
 	tractoron=false
 	tractorendtimer=2
 
+	tractorfx=8
+
+	musicswitch=false
+
 	tcols1={1,3,12}
 	tcols2={12,1,3}
 	tcols3={3,12,1}
@@ -247,6 +251,7 @@ function _update60()
 				if not ischallengingstage then
 					if musicstate < 0 then				
 						gamephase=3
+						stagetimer=6
 					end
 				else
 					--do challenging stage stuff here
@@ -296,6 +301,15 @@ function _update60()
 
 	----------------- game phase 3 -----------------
 	if gamephase==3 then
+		if musicswitch then
+			music(tractorfx)
+			musicswitch=false
+		end
+
+		if not tractoron then
+			music(-1)
+		end
+
 		if stagetimer>0 then -- formation attacks
 			stagetimer-=0.1		
 		else
@@ -420,7 +434,7 @@ function _draw()
 			print("challenging stage",30,64,textcol) -- 68  (128-68)/2 = 60/2 = 30
 		else
 			print("stage " .. stage,50,64,textcol)
-		end		
+		end	
 	end
 
 	if gamephase==2 and not ischallengingstage then
@@ -667,6 +681,7 @@ function flippath(path)
 end
 
 function drawtractorbeam(offx,offy)
+	tractorfx=8
 	for i in all(tractorsprites) do
 		spr(i.spr,i.x+offx,i.y+offy)
 	end	
@@ -687,7 +702,10 @@ function drawtractorbeam(offx,offy)
 	if trmov>40  then 		
 		tractorendtimer-=0.075
 		if tractorendtimer<0 then
+			tractorfx=10
+			musicswitch=true
 			trdir=-1 
+			trmov=40
 		end
 	end
 	if trmov<5  then 

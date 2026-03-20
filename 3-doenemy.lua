@@ -26,7 +26,7 @@ function doenemy()
 					playfield[r][c].nme.ay=playfield[r][c].nme.y
 					playfield[r][c].nme.ph=rnd(1)
 
-					if playfield[r][c].nme.typ==3 and #nmescap==0 and flr(rnd(4))==0 and not triedcapturethisstage then
+					if playfield[r][c].nme.typ==3 and #nmescap==0 and flr(rnd(1))==0 and not triedcapturethisstage then
 						add(nmescap,playfield[r][c].nme)
 						triedcapturethisstage=true					
 					else
@@ -561,10 +561,12 @@ function docapture()
 			else
 				nme.ph=0.25	
 				drawtractorbeam(nme.x-7,nme.y+8)	
+				
 			end					
 		else			
 			nme.index=7
 			tractoron=true
+			musicswitch=true
 		end
 
 		if #rounds > 0 then

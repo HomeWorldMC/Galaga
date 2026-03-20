@@ -1,27 +1,3 @@
-function drawtractorbeam(offx,offy)
-	for i in all(tractorsprites) do
-		spr(i.spr,i.x+offx,i.y+offy)
-	end	
-
-
-	local c1=tcols1[flr(tcol)]
-	local c2=tcols2[flr(tcol)]
-	local c3=tcols3[flr(tcol)]
-
-	tcol+=0.2
-	if tcol>3.8 then tcol=1 end
-
-
-	pal(2,c1,1)
-	pal(11,c2,1)
-	pal(15,c3,1)
-
-	rectfill(offx,offy+trmov,offx+24,offy+40,0)
-	trmov+=0.2*trdir
-	if trmov>40  then trdir=-1 end
-	if trmov<5  then trdir=1 end
-end
-
 function _init()
 	-- disable key repeat
 	
@@ -56,9 +32,10 @@ function _init()
 	
 	-- Constants	
 	pi=3.141592
-	logfile="galaga/log.txt"
+	logfile="log.txt"
+	printh("","log.txt",true)
 
-	invince=false
+	invince=true
 	if invince then
 		maxrounds=5
 		musicstart=3
@@ -84,7 +61,7 @@ function _init()
 	nmetype1frames={64,65}
 	nmetype2frames={72,73}
 	nmetype3frames={80,81,88,89}
-	nmetypeattframes={{65,66,67,68,69,70,71},{73,74,75,76,77,78,79},{81,82,83,84,85,86,87},{89,90,91,92,93,94,95}}
+	nmetypeattframes={{65,66,67,68,69,70,71},{73,74,75,76,77,78,79},{80,82,83,84,85,86,87},{88,90,91,92,93,94,95}}
 	nmeanimspd=0.035
 	nmexmovespd=0.15
 	nmeymovespd=0.85
@@ -157,14 +134,22 @@ function _init()
 
 	
 	paths={
-	--[[top_hairpin_left]] 	{{x=53,y=-3},{x=56,y=7},{x=61,y=16},{x=68,y=25},{x=78,y=33},{x=110,y=60},{x=113,y=70},{x=109,y=79},{x=97,y=81},{x=90,y=76},{x=85,y=66},{x=63,y=32}},
-	--[[right_loop_right]]	--{{x=127,y=114},{x=112,y=110},{x=95,y=101},{x=75,y=87},{x=68,y=75},{x=71,y=63},{x=82,y=60},{x=92,y=70},{x=88,y=83},{x=74,y=84},{x=69,y=66},{x=73,y=46}},
-							{{x=127,y=114},{x=112,y=110},{x=101,y=104},{x=81,y=90},{x=74,y=78},{x=77,y=66},{x=88,y=63},{x=98,y=73},{x=94,y=86},{x=80,y=87},{x=75,y=69},{x=79,y=49}},
-	--[[left_loop_left_outer]]	{{x=0,y=114},{x=28,y=106},{x=46,y=95},{x=60,y=80},{x=62,y=69},{x=56,y=59},{x=44,y=57},{x=33,y=65},{x=31,y=77},{x=42,y=86},{x=58,y=84},{x=63,y=71},{x=63,y=44}},
-	--[[left_loop_left_inner]]	{{x=-3,y=106},{x=17,y=102},{x=28,y=99},{x=37,y=94},{x=45,y=88},{x=53,y=78},{x=55,y=69},{x=48,y=62},{x=38,y=66},{x=37,y=76},{x=45,y=81},{x=55,y=76},{x=55,y=44}},
-	--[[top_hairpin_left_inner]]	{{x=42,y=3},{x=50,y=11},{x=54,y=20},{x=62,y=31},{x=71,y=39},{x=104,y=64},{x=106,y=70},{x=102,y=74},{x=95,y=70},{x=89,y=63},{x=57,y=39}},
-	--[[top_bowtie_right]]	{{x=69,y=2},{x=69,y=23},{x=67,y=45},{x=64,y=63},{x=57,y=81},{x=49,y=96},{x=35,y=106},{x=22,y=101},{x=17,y=90},{x=23,y=78},{x=38,y=71},{x=56,y=65},{x=120,y=43},{x=184,y=20}},
-	--[[left_centreloop_left]]	{{x=0,y=114},{x=17,y=113},{x=30,y=111},{x=44,y=105},{x=61,y=95},{x=70,y=88},{x=76,y=77},{x=77,y=64},{x=76,y=49},{x=68,y=46},{x=64,y=55},{x=64,y=68},{x=65,y=77},{x=70,y=82},{x=140,y=70}}
+	--[[top_hairpin_left]] 			
+	{{x=53,y=-3},{x=56,y=7},{x=61,y=16},{x=68,y=25},{x=78,y=33},{x=110,y=60},{x=113,y=70},{x=109,y=79},{x=97,y=81},{x=90,y=76},{x=85,y=66},{x=63,y=32}},
+	--[[right_loop_right]]			
+	{{x=127,y=114},{x=112,y=110},{x=101,y=104},{x=81,y=90},{x=74,y=78},{x=77,y=66},{x=88,y=63},{x=98,y=73},{x=94,y=86},{x=80,y=87},{x=75,y=69},{x=79,y=49}},
+	--[[left_loop_left_outer]]		
+	{{x=0,y=114},{x=28,y=106},{x=46,y=95},{x=60,y=80},{x=62,y=69},{x=56,y=59},{x=44,y=57},{x=33,y=65},{x=31,y=77},{x=42,y=86},{x=58,y=84},{x=63,y=71},{x=63,y=44}},
+	--[[left_loop_left_inner]]		
+	{{x=-3,y=106},{x=17,y=102},{x=28,y=99},{x=37,y=94},{x=45,y=88},{x=53,y=78},{x=55,y=69},{x=48,y=62},{x=38,y=66},{x=37,y=76},{x=45,y=81},{x=55,y=76},{x=55,y=44}},
+	--[[top_hairpin_left_inner]]	
+	{{x=42,y=3},{x=50,y=11},{x=54,y=20},{x=62,y=31},{x=71,y=39},{x=104,y=64},{x=106,y=70},{x=102,y=74},{x=95,y=70},{x=89,y=63},{x=57,y=39}},
+	--[[top_bowtie_right]]			
+	{{x=69,y=2},{x=69,y=23},{x=67,y=45},{x=64,y=63},{x=57,y=81},{x=49,y=96},{x=35,y=106},{x=22,y=101},{x=17,y=90},{x=23,y=78},{x=38,y=71},{x=56,y=65},{x=120,y=43},{x=184,y=20}},
+	--[[left_centreloop_left]]		
+	{{x=0,y=114},{x=17,y=113},{x=30,y=111},{x=44,y=105},{x=61,y=95},{x=70,y=88},{x=76,y=77},{x=77,y=64},{x=76,y=49},{x=68,y=46},{x=64,y=55},{x=64,y=68},{x=65,y=77},{x=70,y=82},{x=140,y=70}},
+	--[[capture path]]				
+	{{x=69,y=19},{x=68,y=27},{x=61,y=34},{x=58,y=40},{x=58,y=51},{x=69,y=76},{x=75,y=81},{x=82,y=82},{x=86,y=77},{x=86,y=66},{x=80,y=47},{x=71,y=25}}
 	}
 
 	-- Vars
@@ -196,13 +181,18 @@ function _init()
 	wavesetval=1
 	playfieldnmes=0
 
+	tractoron=false
+	tractorendtimer=2
+
 	tcols1={1,3,12}
 	tcols2={12,1,3}
 	tcols3={3,12,1}
 	tcol=1
 
-	trmov=55
-	trdir=40
+	trmov=5
+	trdir=1
+
+	triedcapturethisstage=false
 
 	initialisestars()
 end
@@ -309,7 +299,7 @@ function _update60()
 		if stagetimer>0 then -- formation attacks
 			stagetimer-=0.1		
 		else
-			if #nmesatt==0  then
+			if #nmesatt==0 and #nmescap==0  then
 				if not nmealive and playfieldnmes<=0 then
 					if player.alive  then -- all waves and formations cleared. move to next stage
 						gamephase=4						
@@ -384,11 +374,11 @@ function _draw()
 	--	end
 	--end
 	
-	drawtractorbeam(52,55)	
+	--drawtractorbeam(52,55)	
 	
 	dostarfield()
 
-	--print("kills: " .. stagekills, 5,60,11)
+	print("triedcapturethisstage: " .. tostr(triedcapturethisstage), 5,00,11)
 	--print("nmewavenmes " .. tostr(nmewavenmes), 5,70,11)
 	--print("playfieldnmes " .. tostr(playfieldnmes), 5,80,11)
 	--if nmesatt~=nil then
@@ -538,6 +528,7 @@ function initialisestage()
 	nmerounds={}	
 	nmesatt={}	
 	nmewave={}
+	nmescap={}	
 	nmewavequeue={}
 	explosions={}
 	nmealive=true
@@ -552,6 +543,7 @@ function initialisestage()
 	twave={}
 	nmewavenmes=0
 	respawndelay=5
+	triedcapturethisstage=false
 
 	local nmex=12
 	local nmey=4
@@ -618,10 +610,12 @@ function resetvars()
 	rounds={}
 	nmerounds={}	
 	nmesatt={}
+	nmescap={}
 	explosions={}
 	nmecount=40
 	beginruntimer=0
 	playfield={}
+	triedcapturethisstage=false
 	
 end
 
@@ -672,6 +666,37 @@ function flippath(path)
 	return flippedpath
 end
 
+function drawtractorbeam(offx,offy)
+	for i in all(tractorsprites) do
+		spr(i.spr,i.x+offx,i.y+offy)
+	end	
+
+	local c1=tcols1[flr(tcol)]
+	local c2=tcols2[flr(tcol)]
+	local c3=tcols3[flr(tcol)]
+
+	tcol+=0.3
+	if tcol>3.8 then tcol=1 end
+
+	pal(2,c1,1)
+	pal(11,c2,1)
+	pal(15,c3,1)
+
+	rectfill(offx,offy+trmov,offx+24,offy+40,0)
+	trmov+=0.35*trdir
+	if trmov>40  then 		
+		tractorendtimer-=0.075
+		if tractorendtimer<0 then
+			trdir=-1 
+		end
+	end
+	if trmov<5  then 
+		tractoron=false 
+		trdir=1
+		tractorendtimer=2
+	end
+	
+end
 --function printpath(path) -- delete me
 --	for p in all(path) do
 --		print("x: " .. p.x .. " y: " .. p.y)

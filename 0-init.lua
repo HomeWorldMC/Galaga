@@ -35,7 +35,7 @@ function _init()
 	logfile="log.txt"
 	printh("","log.txt",true)
 
-	invince=true
+	invince=false
 	if invince then
 		maxrounds=5
 		musicstart=3

@@ -507,7 +507,7 @@ function controls()
 		end
 	end
 	
-	if btnp(❎) and stagetimer<=0 then
+	if btnp(❎) and (gamephase==2 or gamephase==3)  then
 		fire=1
 	end
 	

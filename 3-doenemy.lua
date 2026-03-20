@@ -583,6 +583,7 @@ function docapture()
 						add(explosions,{x=nme.x,y=nme.y,t=1})
 						del(nmescap,nme)
 						freelifecheck()	
+						tractoron=false
 
 						stagekills+=1
 					end

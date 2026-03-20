@@ -698,6 +698,7 @@ function drawtractorbeam(offx,offy)
 	pal(15,c3,1)
 
 	rectfill(offx,offy+trmov,offx+24,offy+40,0)
+
 	trmov+=0.35*trdir
 	if trmov>40  then 		
 		tractorendtimer-=0.075

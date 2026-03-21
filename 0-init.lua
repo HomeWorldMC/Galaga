@@ -297,7 +297,7 @@ function _update60()
 
 	if gamephase==6 then
 		maingame()
-		if (swapgamephase==2 or swapgamephase==1 or swapgamephase==4) then
+		if (swapgamephase==2 or swapgamephase==1) then
 			if not ischallengingstage then
 				stageUI()
 				if not sfxon and stage>1 then

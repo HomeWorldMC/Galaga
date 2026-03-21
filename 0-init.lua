@@ -634,7 +634,7 @@ function resetvars()
 end
 
 function initialisestars()
-	cols={5,2,1}
+	cols={5,13,1}
 	stars={}
 	
 	local speed=1
@@ -680,6 +680,13 @@ function flippath(path)
 	return flippedpath
 end
 
+function resettractor()
+	tractorfx=8
+	trdir=1
+	trmov=5
+	tractorendtimer=2
+end
+
 function drawtractorbeam(offx,offy)
 	tractorfx=8
 	for i in all(tractorsprites) do
@@ -712,6 +719,7 @@ function drawtractorbeam(offx,offy)
 	if trmov<5  then 
 		tractoron=false 
 		trdir=1
+		trmov=5
 		tractorendtimer=2
 	end
 	

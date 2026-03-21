@@ -26,9 +26,9 @@ function doenemy()
 					playfield[r][c].nme.ay=playfield[r][c].nme.y
 					playfield[r][c].nme.ph=rnd(1)
 
-					if playfield[r][c].nme.typ==3 and #nmescap==0 and flr(rnd(1))==0 and not triedcapturethisstage then
+					if playfield[r][c].nme.typ==3 and #nmescap==0 and flr(rnd(2))==0 and not triedcapturethisstage then
 						add(nmescap,playfield[r][c].nme)
-						triedcapturethisstage=true					
+						--triedcapturethisstage=true					
 					else
 						add(nmesatt,playfield[r][c].nme)
 						doenemyfireroll(playfield[r][c].nme,true,0,70)
@@ -584,7 +584,7 @@ function docapture()
 						del(nmescap,nme)
 						freelifecheck()	
 						tractoron=false
-
+						resettractor()
 						stagekills+=1
 					end
 				

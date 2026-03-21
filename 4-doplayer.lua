@@ -17,8 +17,8 @@ function doplayer()
 	elseif player.alive then
 		f=1	
 	end
-	
-	spr(f,player.x,player.y)
+	queue_spr(f,player.x,player.y)
+	--spr(f,player.x,player.y)
 end
 
 function doenemyhit()	
@@ -54,7 +54,6 @@ function playerdeath()
 			gameover=true
 		else 		
 			lastgamephase=gamephase
-			stagetimer=6
 		end				
 		player.animlock=false
 		player.t=2	

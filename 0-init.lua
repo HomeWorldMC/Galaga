@@ -5,12 +5,8 @@ function _init()
 
 	--spare colors 15,2,11
 
-	--tractor sprites
 	initialiseconstants()
 	
-	-- Constants	
-	
-
 	invince=true
 	if invince then
 		maxrounds=5
@@ -22,8 +18,21 @@ function _init()
 		poke(0x5f5d,255)
 	end
 		
-	
+	timers={}
 
+	function after(duration,callback)
+		add(timers, {t=0,d=duration, cb=callback})
+	end
+
+	function update_timers(dt)
+		for t in all(timers) do
+			t.t += dt
+			if t.t >= t.d then
+			t.cb()
+			del(timers, t)
+			end
+		end
+	end
 	
 
 	-- Vars
@@ -31,7 +40,6 @@ function _init()
 	firsttime=true
 	maxfreelives=#freelifescores
 	freelivesgiven=1
-	stagetimer=0
 	gamephase=0
 	gameover=true
 	player={x=63,y=112,lives=2,alive=true,t=0,f=1,animlock=1,score=0}
@@ -61,10 +69,7 @@ function _init()
 	tractorfx=8
 
 	musicswitch=false
-
-	tcols1={1,3,12}
-	tcols2={12,1,3}
-	tcols3={3,12,1}
+	
 	tcol=1
 
 	trmov=5
@@ -72,10 +77,16 @@ function _init()
 
 	triedcapturethisstage=false
 
+	drawqueue={}
+	printqueue={}
+	swapgamephase=6
+
 	initialisestars()
 end
 
 function _update60()
+	printh("gamephase="..gamephase..". swapgamephase="..swapgamephase,"log.txt")
+	update_timers(1/30)
 
 	musicstate=stat(24)
 
@@ -87,45 +98,45 @@ function _update60()
 		end
 	end
 
-	if (gamephase==2 or gamephase==3 or gamephase==4) and player.alive then
+	if (gamephase==2 or gamephase==3 or gamephase==4 or gamephase==6) and player.alive then
 		controls()	
 	else
-		getshieldnumbers()	
+		getshieldnumbers()
 		if btnp(🅾️) and gamephase==0 then
 			gamephase=1
 		end
 	end
 
-	----------------- game phase 1 -----------------
 	if gamephase==1 then
 		if musicstate < 0 then
+			--stageUI()
 			if gameover then
-				--initialisestage()
-				startgame()			
-				--getshieldnumbers()	
-				--gamephase=2		
+				startgame()
 			else 
-				if stagetimer>0 then -- timer between stages. gives player a moment to prepare. -- and not stat(57)
-					stagetimer-=0.1				
-					
-				else -- start next stage
-					resetvars()
-					initialisestage()
-					getshieldnumbers() 
-					gamephase=2
-				end
+				resetvars()
+				initialisestage()
+				getshieldnumbers()
+				gamephase=6
+				swapgamephase=2
+				sfx(5,3)
+				stageUI()
+				after(4, function() 
+					gamephase=swapgamephase	
+				end)
 			end
 		end
-	end
-	
-	----------------- game phase 2 -----------------
-	if gamephase==2 then -- first wave attacks
-		if nmewavenmes==0 then -- all wave enemies defeated. 
+	elseif gamephase==2 then
+		maingame()
+		if nmewavenmes==0 then -- all wave enemies defeated or moved to the playfield. 
 			if wavecounter==#nmewavequeue then	-- all waves completed. move to formation attack phase (game phase 3)
 				if not ischallengingstage then
 					if musicstate < 0 then				
-						gamephase=3
-						stagetimer=6
+						gamephase=6
+						swapgamephase=3
+						
+						after(1.5, function() 														
+							gamephase=swapgamephase
+						end)
 					end
 				else
 					--do challenging stage stuff here
@@ -138,8 +149,11 @@ function _update60()
 			end
 		else
 			if not player.alive then -- player died during wave attack. move to game phase 5 (player respawn)
-				gamephase=5
-				stagetimer=9
+				gamephase=6
+				swapgamephase=5
+				after(1.5, function() 
+					gamephase=swapgamephase
+				end)
 				lastgamephase=2
 			end
 		end
@@ -171,10 +185,40 @@ function _update60()
 				end
 			end	
 		end	
-	end
 
-	----------------- game phase 3 -----------------
-	if gamephase==3 then
+		if not ischallengingstage then
+
+			if musicstate>=5 then
+				queue_prt("number of hits ", 30,63,textcol)
+			end
+
+			if musicstate>=6 then
+				if stagekills==40 then
+					queue_prt("perfect !",46,49,8)
+				end
+				queue_prt(stagekills, 90,63,textcol)
+			end
+			
+			if musicstate==7 then
+				
+				if bonusflag then
+					if stagekills<40 then
+						bon=(stagekills*10)
+					else
+						bon=1000
+					end				
+					player.score+=(bon)
+					bonusflag=false
+				end
+				if stagekills<40 then
+					queue_prt("bonus " .. (bon), 44,77,textcol)
+				else
+					queue_prt("special bonus " .. (bon) .. " pts", 22,77,10)
+				end
+			end
+		end
+	elseif gamephase==3 then
+		maingame()
 		if musicswitch then
 			music(tractorfx)
 			musicswitch=false
@@ -184,188 +228,104 @@ function _update60()
 			music(-1)
 		end
 
-		if stagetimer>0 then -- formation attacks
-			stagetimer-=0.1		
-		else
-			if #nmesatt==0 and #nmescap==0  then
-				if not nmealive and playfieldnmes<=0 then
-					if player.alive  then -- all waves and formations cleared. move to next stage
-						gamephase=4						
-						stage+=1
-						rounds={}
-						nmerounds={}
-						fire=0
-						stagekills=0
-						playfieldnmes=0
-						if (stage+1)%4==0 then
-							ischallengingstage=true
-							nmewavespd=1.25
-							stagetimer=15
-							music(4)
-						else
-							ischallengingstage=false
-							nmewavespd=1.75
-							stagetimer=9
-							sfx(5,3)
-						end
-						
+		if #nmesatt==0 and #nmescap==0  then
+			if not nmealive and playfieldnmes<=0 then
+				if player.alive  then -- all waves and formations cleared. move to next stage
+					stage+=1
+					getshieldnumbers()
+					rounds={}
+					nmerounds={}
+					fire=0
+					stagekills=0
+					playfieldnmes=0
+					if (stage+1)%4==0 then
+						ischallengingstage=true
+						nmewavespd=1.25
+						music(4)
 					else
-						gamephase=5
-						stagetimer=9
+						ischallengingstage=false
+						nmewavespd=1.75
 					end
+					gamephase=6
+					swapgamephase=4
+					after(1.5, function() 
+						gamephase=swapgamephase
+					end)
 				else
-					if not player.alive then -- player died during formation attack. move to game phase 5 (player respawn)
-						gamephase=5
-						stagetimer=8
-					end
+					gamephase=6
+					swapgamephase=5
+					after(1.5, function() 
+						gamephase=swapgamephase
+					end)
+				end
+			else
+				if not player.alive then -- player died during formation attack. move to game phase 5 (player respawn)
+					gamephase=6
+					swapgamephase=5
+					after(1.5, function() 
+						gamephase=swapgamephase
+					end)
 				end
 			end
 		end
+	elseif gamephase==4 then
+		maingame()	
+		wavesetval+=1
+		if wavesetval>3 then
+			wavesetval=1
+		end
+		gamephase=6
+		swapgamephase=1
+		after(2, function() 
+			gamephase=swapgamephase
+		end)
+	elseif gamephase==5 then
+		maingame()
+		if #nmesatt==0 then			
+			player.alive=true
+			player.lives-=1
+			player.x=63
+			player.y=112
+			--gamephase=lastgamephase
+			gamephase=6
+			swapgamephase=lastgamephase
+			after(1.5, function() 
+				gamephase=swapgamephase
+			end)
+		end
+	elseif gamephase==6 then
+		maingame()
+		if swapgamephase==2 or swapgamephase==1 or swapgamephase==4 then
+			stageUI()
+			--sfx(5,3)
+		end
 	end
 
-	----------------- game phase 4 -----------------
-	if gamephase==4 then
-		if stagetimer>0 then
-			stagetimer-=0.1
-			getshieldnumbers()
-		else
-			wavesetval+=1
-			if wavesetval>3 then
-				wavesetval=1
-			end
-			gamephase=1
-		end
-	end
-	
-	----------------- game phase 5 -----------------
-	if gamephase==5 then
-		if stagetimer>0 then
-			stagetimer-=0.1
-		else
-			if #nmesatt==0 then			
-				player.alive=true
-				player.lives-=1
-				player.x=63
-				player.y=112
-				gamephase=lastgamephase
-			end
-		end
-	end
+	if gamephase==1 or (gamephase==6 and swapgamephase==1) or (gamephase==6 and swapgamephase==2) then 
+		--stageUI()
+		--sfx(5,3)
+	end -- I don't like this.
 end
 	
 function _draw()
 	cls(0)
+	dostarfield()	
 
-	--for i=1,15 do
-	--	if i~=7 and i~=10 then
-	--		--pal(i,i+128,1)
-	--	end
-	--end
-	
-	--drawtractorbeam(52,55)	
-	
-	dostarfield()
-
-	--print("triedcapturethisstage: " .. tostr(triedcapturethisstage), 5,00,11)
-	--print("nmewavenmes " .. tostr(nmewavenmes), 5,70,11)
-	--print("playfieldnmes " .. tostr(playfieldnmes), 5,80,11)
-	--if nmesatt~=nil then
-	--	print("#nmesatt: " .. #nmesatt, 5,90,11)
-	--end	
-	--print("ischallengingstage: " .. tostr(ischallengingstage), 5,80,11)
-	--print("gamephase: " .. tostr(gamephase), 5,90,11)
-	--if nmewavequeue~=nil then
-		--print("#nmewavequeue: " .. #nmewavequeue, 5,100,11)
-	--end	
-	--print("#nmewavequeue: " .. #nmewavequeue, 5,100,11)
-	--print("wavecounter: " .. tostr(wavecounter), 5,110,11)
-	--sprint("stage",35,25)
+	print("gamephase:"..tostr(gamephase), 5,90,7)
+	print("swapgamephase:"..tostr(swapgamephase), 5,100,7)
 	
 	if gamephase==0 then
-		local xoff=0
-		local yoff=0
-		for li=1,#logo do			
-			spr(logo[li],32+xoff,20+yoff)
-			xoff+=8
-			if xoff>=64 then
-				xoff=0
-				yoff+=8
-			end
-		end
-		print("rEMADE",49,39,13)
-		print("bY",58,45,13)
-		print("tEX",67,45,13)
-		if firsttime then
-			print("[press start to play]", 22,100,textcol)
-		else
-			print("game over", 45,93,textcol)
-			print("[press start to play again]", 10,100,textcol)
-		end		
+		startscreen()
 	end		
 	
-	if gamephase==1 or gamephase==4 then
-		if ischallengingstage then
-			print("challenging stage",30,64,textcol) -- 68  (128-68)/2 = 60/2 = 30
-		else
-			print("stage " .. stage,50,64,textcol)
-		end	
-	end
-
-	if gamephase==2 and not ischallengingstage then
-
-		if musicstate>=5 then
-			print("number of hits ", 30,63,textcol)
-		end
-
-		if musicstate>=6 then
-			if stagekills==40 then
-				print("perfect !",46,49,8)
-			end
-			print(stagekills, 90,63,textcol)
-		end
-		
-		if musicstate==7 then
-			
-			if bonusflag then
-				if stagekills<40 then
-					bon=(stagekills*10)
-				else
-					bon=1000
-				end				
-				player.score+=(bon)
-				bonusflag=false
-			end
-			if stagekills<40 then
-				print("bonus " .. (bon), 44,77,textcol)
-			else
-				print("special bonus " .. (bon) .. " pts", 22,77,10)
-			end
-		end
-	end
-
-	if gamephase>=2 then	
-		doenemy()
-		dowave()
-
-		if gamephase~=5 then
-			doplayer()
-		end
-		doexplosions()
-		animateplayerrounds(rounds,2,-1)
-		animateenemyrounds(nmerounds,18,1) 
-	end	
-	
-	if gamephase>1 or musicstate==2 or musicstate==3then
+	if gamephase>1 or musicstate==2 or musicstate==3 then
 		setstageicons()
 		setlivesicons()		
 	end
 
-	if musicstate==3 then
-		spr(1,player.x,player.y)
-	end
-	
-	-- Draw game border
 	rect(0,0,127,127,7)
+	flush_drawq()
+	flush_printq()
 end
 
 function controls() 
@@ -381,8 +341,10 @@ function controls()
 		end
 	end
 	
-	if btnp(❎) and (gamephase==2 or gamephase==3)  then
-		fire=1
+	if btnp(❎) then
+		if (gamephase==2 or gamephase==3 or (gamephase==6 and swapgamephase==2) or (gamephase==6 and swapgamephase==3)) then
+			fire=1
+		end
 	end
 	
 	if fire==1 and #rounds<maxrounds then
@@ -406,7 +368,6 @@ function startgame()
 	playerlifetimer=7
 	gameover=false
 	firsttime=false
-	stagetimer=0 
 	stage=1
 end
 
@@ -526,7 +487,8 @@ end
 
 function doexplosions()
 	for n=#explosions,1,-1 do
-		spr(explosionsframes[flr(explosions[n].t)],explosions[n].x,explosions[n].y)
+		--spr(explosionsframes[flr(explosions[n].t)],explosions[n].x,explosions[n].y)
+		queue_spr(explosionsframes[flr(explosions[n].t)],explosions[n].x,explosions[n].y)
 		explosions[n].t+=explosionspd
 		if explosions[n].t>(6-explosionspd) then
 			del(explosions,explosions[n])
@@ -564,7 +526,8 @@ end
 function drawtractorbeam(offx,offy)
 	tractorfx=8
 	for i in all(tractorsprites) do
-		spr(i.spr,i.x+offx,i.y+offy)
+		queue_spr(i.spr,i.x+offx,i.y+offy)
+		--spr(i.spr,i.x+offx,i.y+offy)
 	end	
 
 	local c1=tcols1[flr(tcol)]
@@ -598,30 +561,76 @@ function drawtractorbeam(offx,offy)
 	end
 	
 end
---function printpath(path) -- delete me
---	for p in all(path) do
---		print("x: " .. p.x .. " y: " .. p.y)
---	end
---end
 
---function sprint(text,x,y)
---	local strsize = #text
---	local char=""
---	local sprt=0
---	local space=0
---
---	for i=1,strsize do		
---		char=sub(text,i,i)
---		
---
---		if font2[char]==nil then
---			sprt=0
---			space=0
---		else
---			sprt=font2[char]
---			space=fontspaces2[sprt-227]
---		end
---		spr(sprt,x,y)
---		x=x+8-space
---	end
---end
+function queue_spr(n, x, y, w, h, flip_x, flip_y)
+  add(drawqueue, {
+    n=n, x=x, y=y,
+    w=w or 1, h=h or 1,
+    fx=flip_x, fy=flip_y
+  })
+end
+
+function queue_prt(txt, x, y, col)
+  add(printqueue, {
+    t=txt, x=x, y=y,
+    c=col
+  })
+end
+
+function flush_drawq()
+  for d in all(drawqueue) do
+    spr(d.n, d.x, d.y, d.w, d.h, d.fx, d.fy)
+  end
+  drawqueue = {}
+end
+
+function flush_printq()
+  for d in all(printqueue) do
+	print(d.t,d.x,d.y,d.c)
+  end
+  printqueue = {}
+end
+
+function startscreen()
+	local xoff=0
+	local yoff=0
+	for li=1,#logo do			
+		spr(logo[li],32+xoff,20+yoff)
+		xoff+=8
+		if xoff>=64 then
+			xoff=0
+			yoff+=8
+		end
+	end
+	print("rEMADE",49,39,13)
+	print("bY",58,45,13)
+	print("tEX",67,45,13)
+	if firsttime then
+		print("[press start to play]", 22,100,textcol)
+	else
+		print("game over", 45,93,textcol)
+		print("[press start to play again]", 10,100,textcol)
+	end	
+end
+
+function stageUI()
+	if ischallengingstage then
+		--print("challenging stage",30,64,textcol) -- 68  (128-68)/2 = 60/2 = 30
+		queue_prt("challenging stage",30,64,textcol)
+	else
+		--print("stage " .. stage,50,64,textcol)
+		queue_prt("stage " .. stage,50,64,textcol)
+	end	
+end
+
+function maingame()
+	doenemy()
+	dowave()
+
+	if gamephase~=5 then
+		doplayer()
+	end
+	doexplosions()
+	animateplayerrounds(rounds,2,-1)
+	animateenemyrounds(nmerounds,18,1) 
+end

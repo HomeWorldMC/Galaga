@@ -40,7 +40,8 @@ function setstageicons()
 	for sn=1, #numshields do
 		for i=1, numshields[sn] do
 			sx-=xoffset[sn]
-			spr(stageiconsprites[sn],sx,sy)
+			--spr(stageiconsprites[sn],sx,sy)
+			queue_spr(stageiconsprites[sn],sx,sy)
 		end
 	end
 end
@@ -48,7 +49,8 @@ end
 function setlivesicons()
 	local sx=2
 	for i=1,player.lives do
-		spr(1,sx,118)
+		--spr(1,sx,118)
+		queue_spr(1,sx,118)
 		sx+=8
 	end
 

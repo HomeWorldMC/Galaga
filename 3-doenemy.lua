@@ -6,7 +6,8 @@ function doenemy()
 	beginruntimer-=0.15
 	
 	nmecount=0	
-	
+	--queue_prt("doenemy", 5,100,7)
+	--queue_prt("stagetimer="..tostr(stagetimer),5,110,7)
 	-- For each slot, do movement.
 	-- if the slot is not empty, get current alive nme count for random number determining attack run
 	-- if attack run true, set attack position, add nme to nmeatt collection, and check if nme fires during run
@@ -19,7 +20,7 @@ function doenemy()
 				playfield[r][c].nme.x=playfield[r][c].x
 
 				-- check to see if nme does attack run
-				if beginruntimer<0 and flr(rnd(nmecount*5)+1)==1 and #nmesatt<3 and playfield[r][c].nme.mode==0 and player.alive and stagetimer<=0 and gamephase==3 then
+				if beginruntimer<0 and flr(rnd(nmecount*5)+1)==1 and #nmesatt<3 and playfield[r][c].nme.mode==0 and player.alive and gamephase==3 then
 					beginruntimer=4
 					playfield[r][c].nme.mode=1
 					playfield[r][c].nme.ax=playfield[r][c].nme.x
@@ -305,7 +306,9 @@ function drawsprite(nme,flipy)
 		end
 	end
 	nme.f=fr
-	spr(nme.f,nme.x,nme.y,1,1,false,flipy)
+	--add(drawqueue,{s=nme.f,x=nme.x,y=nme.y,w=1,h=1,flix=false,flipy=flipy})
+	queue_spr(nme.f,nme.x,nme.y,1,1,false,flipy)
+	--spr(nme.f,nme.x,nme.y,1,1,false,flipy)
 end
 
 function drawrotatesprite(ang,x,y,nme)
@@ -349,7 +352,9 @@ function drawrotatesprite(ang,x,y,nme)
 		{frs[6],false,false}
 	}
 
-	spr(fram[index][1],x,y,1,1,fram[index][2],fram[index][3])
+	--spr(fram[index][1],x,y,1,1,fram[index][2],fram[index][3])
+	--add(s=fram[index][1],x=x,y=y,w=1,h=1,flipx=fram[index][2],flipy=fram[index][3])
+	queue_spr(fram[index][1],x,y,1,1,fram[index][2],fram[index][3])
 	--print(tostr(fram[index][1]),x,y+9,7)
 end
 

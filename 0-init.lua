@@ -53,6 +53,7 @@ function _init()
 	stage=1
 	maxfiresperwave=2
 	musicstate=-1
+	sfxon=false
 	jankymusictimer=0
 	pausetimer=2
 	stagekills=0
@@ -118,9 +119,7 @@ function _update60()
 				getshieldnumbers()
 				gamephase=6
 				swapgamephase=2
-				sfx(5,3)
-				stageUI()
-				after(4, function() 
+				after(2, function() 
 					gamephase=swapgamephase	
 				end)
 			end
@@ -248,13 +247,13 @@ function _update60()
 					end
 					gamephase=6
 					swapgamephase=4
-					after(1.5, function() 
+					after(1.5, function()
 						gamephase=swapgamephase
 					end)
 				else
 					gamephase=6
 					swapgamephase=5
-					after(1.5, function() 
+					after(1.5, function()
 						gamephase=swapgamephase
 					end)
 				end
@@ -262,7 +261,7 @@ function _update60()
 				if not player.alive then -- player died during formation attack. move to game phase 5 (player respawn)
 					gamephase=6
 					swapgamephase=5
-					after(1.5, function() 
+					after(1.5, function()
 						gamephase=swapgamephase
 					end)
 				end
@@ -276,7 +275,8 @@ function _update60()
 		end
 		gamephase=6
 		swapgamephase=1
-		after(2, function() 
+
+		after(1.5, function() 
 			gamephase=swapgamephase
 		end)
 	elseif gamephase==5 then
@@ -293,18 +293,35 @@ function _update60()
 				gamephase=swapgamephase
 			end)
 		end
-	elseif gamephase==6 then
-		maingame()
-		if swapgamephase==2 or swapgamephase==1 or swapgamephase==4 then
-			stageUI()
-			--sfx(5,3)
-		end
 	end
 
-	if gamephase==1 or (gamephase==6 and swapgamephase==1) or (gamephase==6 and swapgamephase==2) then 
-		--stageUI()
-		--sfx(5,3)
-	end -- I don't like this.
+	if gamephase==6 then
+		maingame()
+		if (swapgamephase==2 or swapgamephase==1 or swapgamephase==4) then
+			if not ischallengingstage then
+				stageUI()
+				if not sfxon and stage>1 then
+					sfx(5,3)-- 3,4,?,1,2
+					sfxon=true
+				end
+			else
+				stageUI()
+			end
+		end
+	else
+		sfxon=false
+	end
+
+	if gamephase==1 and swapgamephase==1 then
+		stageUI()
+		setstageicons()
+		setlivesicons()	
+		doplayer()	
+	end
+	if gamephase>1 or musicstate==2 or musicstate==3 then
+		setstageicons()
+		setlivesicons()				
+	end
 end
 	
 function _draw()
@@ -318,10 +335,7 @@ function _draw()
 		startscreen()
 	end		
 	
-	if gamephase>1 or musicstate==2 or musicstate==3 then
-		setstageicons()
-		setlivesicons()		
-	end
+	
 
 	rect(0,0,127,127,7)
 	flush_drawq()

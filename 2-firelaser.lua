@@ -6,7 +6,8 @@ end
 
 function animateplayerrounds(rnds,sp,dir)
 	for i in all(rnds) do
-		spr(sp,i.x-1,i.y-5)
+		--spr(sp,i.x-1,i.y-5)
+		queue_spr(sp,i.x-1,i.y-5)
 		pset(i.x-1,i.y-5,11)
 		i.y+= 3*dir
 		if i.y < 4 or i.y>132 then
@@ -26,7 +27,7 @@ function animateenemyrounds(rnds,sp,dir)
 		if i.x < 0 or i.x > 128 or i.y>132 or i.y<0 then
 			del(rnds,i)
 		end
-		
-		spr(sp,i.x-1,i.y-5)
+		queue_spr(sp,i.x-1,i.y-5)
+		--spr(sp,i.x-1,i.y-5)
 	end
 end

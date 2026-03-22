@@ -1,24 +1,24 @@
 function initialiseconstants()
     tractorsprites={
-        {spr=128,x=0,y=0},
-        {spr=129,x=8,y=0},
-        {spr=130,x=16,y=0},
+        {spr=64,x=0,y=0},
+        {spr=65,x=8,y=0},
+        {spr=66,x=16,y=0},
 
-        {spr=144,x=0,y=8},
-        {spr=145,x=8,y=8},
-        {spr=146,x=16,y=8},
+        {spr=80,x=0,y=8},
+        {spr=81,x=8,y=8},
+        {spr=82,x=16,y=8},
 
-        {spr=160,x=0,y=16},
-        {spr=161,x=8,y=16},
-        {spr=162,x=16,y=16},
+        {spr=96,x=0,y=16},
+        {spr=97,x=8,y=16},
+        {spr=98,x=16,y=16},
 
-        {spr=176,x=0,y=24},
-        {spr=177,x=8,y=24},
-        {spr=178,x=16,y=24},
+        {spr=112,x=0,y=24},
+        {spr=113,x=8,y=24},
+        {spr=114,x=16,y=24},
 
-        {spr=131,x=0,y=32},
-        {spr=132,x=8,y=32},
-        {spr=133,x=16,y=32}
+        {spr=128,x=0,y=32},
+        {spr=129,x=8,y=32},
+        {spr=130,x=16,y=32}
     }
 
     pi=3.141592
@@ -28,7 +28,9 @@ function initialiseconstants()
     typ={3,1,1,2,2}
 	hp={2,1,1,1,1}
 
-	logo={192,193,194,195,196,197,198,199,208,209,210,211,212,213,214,215,224,225,226,227,228,229,230,231}
+	logo={67,68,69,70,71,72,73,74,
+	83,84,85,86,87,88,89,90,
+	99,100,101,102,103,104,105,106}
 	nmescores={5,5,20}
 	freelifescores={2000,3800,5800,8000,10400,13000,15800,18800,22000,25400,29000,32800,36800,40000}
 	nmehitboxwidth=7	
@@ -37,10 +39,10 @@ function initialiseconstants()
 	explosionsframes={3,4,5,6,7}
 	explosionspd=0.4	
 	stageiconsprites={8,9,10,11,12,13}	
-	nmetype1frames={64,65}
-	nmetype2frames={72,73}
-	nmetype3frames={80,81,88,89}
-	nmetypeattframes={{65,66,67,68,69,70,71},{73,74,75,76,77,78,79},{80,82,83,84,85,86,87},{88,90,91,92,93,94,95}}
+	nmetype1frames={32,33}
+	nmetype2frames={40,41}
+	nmetype3frames={48,49,56,57}
+	nmetypeattframes={{33,34,35,36,37,38,39},{41,42,43,44,45,46,47},{48,50,51,52,53,54,55},{56,58,59,60,61,62,63}}
 	nmeanimspd=0.035
 	nmexmovespd=0.15
 	nmeymovespd=0.85

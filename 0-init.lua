@@ -81,7 +81,9 @@ function _init()
 	triedcapturethisstage=false
 
 	drawqueue={}
+	tractorqueue={}
 	printqueue={}
+	rectfillqueue={}
 	swapgamephase=6
 
 	endofstage=false
@@ -184,7 +186,7 @@ function _update60()
 				gamephase=6
 				swapgamephase=5
 				dolog("gamephase-info-to")
-				after(0, function()
+				after(1.5, function()
 					gamephase=swapgamephase
 					dolog("gamephase-info-switched")
 				end)
@@ -317,14 +319,20 @@ end
 	
 function _draw()
 	cls(0)
-	dostarfield()	
+	dostarfield()
+
 	
+	--flush_rectfillq()
+	flush_drawq()
+	flush_drawqt()
+
 	if gamephase==0 or gamephase==1 or gamephase==8 then
 		startscreen()
 	end
 
 	rect(0,0,127,127,7)
-	flush_drawq()
+
+
 	flush_printq()
 end
 
@@ -519,7 +527,7 @@ end
 function doexplosions()
 	for n=#explosions,1,-1 do
 		--spr(explosionsframes[flr(explosions[n].t)],explosions[n].x,explosions[n].y)
-		queue_spr(explosionsframes[flr(explosions[n].t)],explosions[n].x,explosions[n].y)
+		queue_spr(explosionsframes[flr(explosions[n].t)],explosions[n].x,explosions[n].y,1,1,false,false)
 		explosions[n].t+=explosionspd
 		if explosions[n].t>(6-explosionspd) then
 			del(explosions,explosions[n])
@@ -556,10 +564,8 @@ end
 
 function drawtractorbeam(offx,offy)
 	tractorfx=8
-	for i in all(tractorsprites) do
-		queue_spr(i.spr,i.x+offx,i.y+offy)
-		--spr(i.spr,i.x+offx,i.y+offy)
-	end	
+	queue_sspr(0, 32, 24, trmov, offx, offy, 24, trmov)
+
 
 	local c1=tcols1[flr(tcol)]
 	local c2=tcols2[flr(tcol)]
@@ -572,7 +578,7 @@ function drawtractorbeam(offx,offy)
 	pal(11,c2,1)
 	pal(15,c3,1)
 
-	rectfill(offx,offy+trmov,offx+24,offy+40,0)
+	--queue_rectfill(offx,offy+trmov,offx+24,offy+40,0)
 
 	trmov+=0.35*trdir
 	if trmov>40  then 		
@@ -601,11 +607,38 @@ function queue_spr(n, x, y, w, h, flip_x, flip_y)
   })
 end
 
+function queue_sspr(sx, sy, sw, sh, dx, dy, dw,dh)
+  add(tractorqueue, {
+    sx=sx, sy=sy, sw=sw, sh=sh, dx=dx, dy=dy, dw=dw,dh=dh
+  })
+end
+
 function queue_prt(txt, x, y, col)
   add(printqueue, {
     t=txt, x=x, y=y,
     c=col
   })
+end
+
+function queue_rectfill(a,b,c,d,e)	
+	add(rectfillqueue, {
+		x1=a, y1=b, x2=c, y2=d, col=e
+  	})
+end
+
+function flush_rectfillq()
+  for d in all(rectfillqueue) do
+	rectfill(d.x1,d.y1,d.x2,d.y2,d.col)
+	--queue_prt("rectfill: x1="..x1..",y1="..y1..",x2="..x2..",y2="..y2..",col="..col,5,60,70)
+  end
+  rectfillqueue = {}
+end
+
+function flush_drawqt()
+  for d in all(tractorqueue) do
+    sspr(d.sx, d.sy, d.sw, d.sh, d.dx, d.dy, d.dw, d.dh)
+  end
+  tractorqueue = {}
 end
 
 function flush_drawq()

@@ -29,7 +29,7 @@ function doenemy()
 
 					if playfield[r][c].nme.typ==3 and #nmescap==0 and flr(rnd(2))==0 and not triedcapturethisstage then
 						add(nmescap,playfield[r][c].nme)
-						--triedcapturethisstage=true					
+						triedcapturethisstage=true					
 					else
 						add(nmesatt,playfield[r][c].nme)
 						doenemyfireroll(playfield[r][c].nme,true,0,70)

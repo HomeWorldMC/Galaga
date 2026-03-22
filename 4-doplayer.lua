@@ -17,7 +17,7 @@ function doplayer()
 	elseif player.alive then
 		f=1	
 	end
-	queue_spr(f,player.x,player.y)
+	queue_spr(f,player.x,player.y,1,1,false,false)
 	--spr(f,player.x,player.y)
 end
 

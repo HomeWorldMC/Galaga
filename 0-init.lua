@@ -7,7 +7,7 @@ function _init()
 
 	initialiseconstants()
 	
-	invince=false
+	invince=true
 	if invince then
 		maxrounds=5
 		musicstart=3
@@ -144,8 +144,7 @@ function _update60()
 		end
 	elseif gamephase==2 then -- first wave attacks		
 		maingame()
-		prepwaves()
-		
+		prepwaves()		
 		if nmewavenmes==0 then -- all wave enemies defeated or moved to the playfield. 
 			if wavecounter==#nmewavequeue then	-- all waves completed. move to formation attack phase (game phase 3)
 				if not ischallengingstage then
@@ -160,6 +159,13 @@ function _update60()
 						end)
 					else
 						doCSScreen()
+						if musicstate==7 then
+							jankymusictimer+=0.1
+							if jankymusictimer>5 then
+								music(-1)
+								jankymusictimer=0
+							end
+						end
 					end
 				else
 					--do end of challenging stage stuff here
@@ -178,16 +184,13 @@ function _update60()
 				gamephase=6
 				swapgamephase=5
 				dolog("gamephase-info-to")
-				after(1.5, function()
+				after(0, function()
 					gamephase=swapgamephase
 					dolog("gamephase-info-switched")
 				end)
 				lastgamephase=2
 			end
 		end
-
-		
-
 	elseif gamephase==3 then --- formation attacks
 		maingame()
 		if musicswitch then

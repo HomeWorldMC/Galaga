@@ -70,6 +70,8 @@ function _init()
 	tractorfx=8
 
 	musicswitch=false
+	challengingmusicswitch=false
+	stagesfx=false
 	
 	tcol=1
 
@@ -82,11 +84,12 @@ function _init()
 	printqueue={}
 	swapgamephase=6
 
+	endofstage=false
+
 	initialisestars()
 end
 
 function _update60()
-	printh("gamephase="..gamephase..". swapgamephase="..swapgamephase,"log.txt")
 	update_timers(1/30)
 
 	musicstate=stat(24)
@@ -99,7 +102,9 @@ function _update60()
 		end
 	end
 
-	if (gamephase==2 or gamephase==3 or gamephase==4 or gamephase==6) and player.alive then
+
+
+	if (gamephase==2 or gamephase==3 or gamephase==4 or gamephase==6 or gamephase==7) and player.alive then
 		controls()	
 	else
 		getshieldnumbers()
@@ -109,49 +114,73 @@ function _update60()
 	end
 
 	if gamephase==1 then
+		-- check if this stage is a challenging stage
+		if (stage+1)%4==0 then
+			ischallengingstage=true
+			nmewavespd=1.25		
+		else
+			ischallengingstage=false
+			nmewavespd=1.75
+		end
+
+		getshieldnumbers()
+
 		if musicstate < 0 then
-			--stageUI()
 			if gameover then
 				startgame()
 			else 
 				resetvars()
 				initialisestage()
 				getshieldnumbers()
-				gamephase=6
+
+				dolog("gamephase-info-moving")
+				gamephase=7
 				swapgamephase=2
+				dolog("gamephase-info-to")
 				after(2, function() 
 					gamephase=swapgamephase	
+					dolog("gamephase-info-switched")
 				end)
+				stagesfx=true
 			end
 		end
-	elseif gamephase==2 then
+	elseif gamephase==2 then -- first wave attacks		
 		maingame()
 		if nmewavenmes==0 then -- all wave enemies defeated or moved to the playfield. 
 			if wavecounter==#nmewavequeue then	-- all waves completed. move to formation attack phase (game phase 3)
 				if not ischallengingstage then
-					if musicstate < 0 then				
+					if musicstate < 0 then
+						dolog("gamephase-info-moving")
 						gamephase=6
 						swapgamephase=3
-						
-						after(1.5, function() 														
+						dolog("gamephase-info-to")
+						after(0.25, function()
 							gamephase=swapgamephase
+							dolog("gamephase-info-switched")
 						end)
+					else
+						doCSScreen()
 					end
 				else
-					--do challenging stage stuff here
+					--do end of challenging stage stuff here
 					if musicstate < 0 then
-						music(5)	
+						printh("--end of challenging stage-- ischallengingstage="..tostr(ischallengingstage),"log.txt")
+						music(5)
 						ischallengingstage=false
+						challengingmusicswitch=false
 						bonusflag=true
 					end
 				end
 			end
 		else
 			if not player.alive then -- player died during wave attack. move to game phase 5 (player respawn)
+				dolog("gamephase-info-moving")
 				gamephase=6
 				swapgamephase=5
+				dolog("gamephase-info-to")
 				after(1.5, function() 
 					gamephase=swapgamephase
+					dolog("gamephase-info-switched")
 				end)
 				lastgamephase=2
 			end
@@ -184,39 +213,7 @@ function _update60()
 				end
 			end	
 		end	
-
-		if not ischallengingstage then
-
-			if musicstate>=5 then
-				queue_prt("number of hits ", 30,63,textcol)
-			end
-
-			if musicstate>=6 then
-				if stagekills==40 then
-					queue_prt("perfect !",46,49,8)
-				end
-				queue_prt(stagekills, 90,63,textcol)
-			end
-			
-			if musicstate==7 then
-				
-				if bonusflag then
-					if stagekills<40 then
-						bon=(stagekills*10)
-					else
-						bon=1000
-					end				
-					player.score+=(bon)
-					bonusflag=false
-				end
-				if stagekills<40 then
-					queue_prt("bonus " .. (bon), 44,77,textcol)
-				else
-					queue_prt("special bonus " .. (bon) .. " pts", 22,77,10)
-				end
-			end
-		end
-	elseif gamephase==3 then
+	elseif gamephase==3 then --- formation attacks
 		maingame()
 		if musicswitch then
 			music(tractorfx)
@@ -229,98 +226,102 @@ function _update60()
 
 		if #nmesatt==0 and #nmescap==0  then
 			if not nmealive and playfieldnmes<=0 then
-				if player.alive  then -- all waves and formations cleared. move to next stage
-					stage+=1
+				if player.alive then -- all waves and formations cleared. move to next stage
 					getshieldnumbers()
 					rounds={}
 					nmerounds={}
 					fire=0
 					stagekills=0
 					playfieldnmes=0
-					if (stage+1)%4==0 then
-						ischallengingstage=true
-						nmewavespd=1.25
-						music(4)
-					else
-						ischallengingstage=false
-						nmewavespd=1.75
-					end
+					dolog("gamephase-info-moving")
 					gamephase=6
 					swapgamephase=4
+					dolog("gamephase-info-to")
 					after(1.5, function()
 						gamephase=swapgamephase
+						dolog("gamephase-info-switched")
 					end)
 				else
+					dolog("gamephase-info-moving")
 					gamephase=6
 					swapgamephase=5
+					dolog("gamephase-info-to")
 					after(1.5, function()
 						gamephase=swapgamephase
+						dolog("gamephase-info-switched")
 					end)
 				end
 			else
 				if not player.alive then -- player died during formation attack. move to game phase 5 (player respawn)
+					dolog("gamephase-info-moving")
 					gamephase=6
 					swapgamephase=5
+					dolog("gamephase-info-to")
 					after(1.5, function()
 						gamephase=swapgamephase
+						dolog("gamephase-info-switched")
 					end)
 				end
 			end
 		end
-	elseif gamephase==4 then
+	elseif gamephase==4 then --enemies cleared
 		maingame()	
 		wavesetval+=1
 		if wavesetval>3 then
 			wavesetval=1
 		end
+		dolog("gamephase-info-moving")
 		gamephase=6
 		swapgamephase=1
-
+		dolog("gamephase-info-to")
 		after(1.5, function() 
 			gamephase=swapgamephase
+			dolog("gamephase-info-switched")
 		end)
-	elseif gamephase==5 then
+		stage+=1
+	elseif gamephase==5 then -- player dead
 		maingame()
-		if #nmesatt==0 then			
-			player.alive=true
-			player.lives-=1
-			player.x=63
-			player.y=112
-			--gamephase=lastgamephase
-			gamephase=6
-			swapgamephase=lastgamephase
-			after(1.5, function() 
-				gamephase=swapgamephase
-			end)
+		if player.lives<0 then
+
+		else
+			if #nmesatt==0 then
+				player.x=63
+				player.y=112
+				dolog("gamephase-info-moving")
+				gamephase=6
+				swapgamephase=lastgamephase
+				dolog("gamephase-info-to")
+				after(1.5, function() 
+					gamephase=swapgamephase
+					dolog("gamephase-info-switched")
+					player.alive=true
+				end)
+			end
 		end
 	end
 
 	if gamephase==6 then
 		maingame()
-		if (swapgamephase==2 or swapgamephase==1) then
-			if not ischallengingstage then
-				stageUI()
-				if not sfxon and stage>1 then
-					sfx(5,3)-- 3,4,?,1,2
-					sfxon=true
-				end
-			else
-				stageUI()
-			end
-		end
-	else
-		sfxon=false
 	end
 
-	if gamephase==1 and swapgamephase==1 then
-		stageUI()
+	if gamephase==7 then
+		maingame()
+		stageUI()		
 		setstageicons()
-		setlivesicons()	
-		doplayer()	
+		setlivesicons()
+		if stagesfx then
+			if ischallengingstage then	
+				music(4)
+			else
+				sfx(5,3)
+			end
+			stagesfx=false
+		end
 	end
-	if gamephase>1 or musicstate==2 or musicstate==3 then
+
+	if gamephase>1 then
 		setstageicons()
-		setlivesicons()				
+		setlivesicons()
 	end
 end
 	
@@ -328,10 +329,12 @@ function _draw()
 	cls(0)
 	dostarfield()	
 
-	print("gamephase:"..tostr(gamephase), 5,90,7)
-	print("swapgamephase:"..tostr(swapgamephase), 5,100,7)
+	--if nmesatt~=nil then print("#nmesatt:"..tostr(#nmesatt), 5,80,7) end
+	--if nmescap~=nil then print("#nmescap:"..tostr(#nmescap), 5,90,7) end
+	--print("gamephase:"..tostr(gamephase), 5,100,7)
+	--print("swapgamephase:"..tostr(swapgamephase), 5,110,7)
 	
-	if gamephase==0 then
+	if gamephase==0 or gamephase==1 then
 		startscreen()
 	end		
 	
@@ -340,6 +343,36 @@ function _draw()
 	rect(0,0,127,127,7)
 	flush_drawq()
 	flush_printq()
+end
+
+function doCSScreen()
+	if musicstate>=5 then
+		queue_prt("number of hits ", 30,63,textcol)
+	end
+
+	if musicstate>=6 then
+		if stagekills==40 then
+			queue_prt("perfect !",46,49,8)
+		end
+		queue_prt(stagekills, 90,63,textcol)
+	end
+
+	if musicstate==7 then				
+		if bonusflag then
+			if stagekills<40 then
+				bon=(stagekills*10)
+			else
+				bon=1000
+			end
+			player.score+=(bon)
+			bonusflag=false
+		end
+		if stagekills<40 then
+			queue_prt("bonus " .. (bon), 44,77,textcol)
+		else
+			queue_prt("special bonus " .. (bon) .. " pts", 22,77,10)
+		end
+	end
 end
 
 function controls() 
@@ -619,12 +652,14 @@ function startscreen()
 	print("rEMADE",49,39,13)
 	print("bY",58,45,13)
 	print("tEX",67,45,13)
-	if firsttime then
-		print("[press start to play]", 22,100,textcol)
-	else
-		print("game over", 45,93,textcol)
-		print("[press start to play again]", 10,100,textcol)
-	end	
+	if gamephase==0 then
+		if firsttime then
+			print("[press start to play]", 22,100,textcol)
+		else
+			print("game over", 45,93,textcol)
+			print("[press start to play again]", 10,100,textcol)
+		end	
+	end
 end
 
 function stageUI()
@@ -640,11 +675,26 @@ end
 function maingame()
 	doenemy()
 	dowave()
-
 	if gamephase~=5 then
 		doplayer()
 	end
 	doexplosions()
 	animateplayerrounds(rounds,2,-1)
 	animateenemyrounds(nmerounds,18,1) 
+end
+
+function dolog(num)
+	if num=="gamephase-info-moving" then
+		printh("Moving from - gamephase="..gamephase..", swapgamephase="..swapgamephase..". Is challenging stage: "..tostr(ischallengingstage),"log.txt")	
+	elseif num=="gamephase-info-to" then
+		printh("	to - gamephase="..gamephase..", swapgamephase="..swapgamephase,"log.txt")
+	elseif num=="gamephase-info-switched" then
+		printh("	switched - gamephase="..gamephase..". swapgamephase="..swapgamephase,"log.txt")
+	elseif num=="gamephase-info-moving2" then
+		printh("Moving from - gamephase="..gamephase.." to 1, is challenging stage: "..tostr(ischallengingstage),"log.txt")
+	elseif num=="show-stage-title" then
+		printh("--show Stage title--","log.txt")
+	else
+		printh("{no log entry for that}","log.txt")
+	end
 end

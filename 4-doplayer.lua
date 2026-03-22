@@ -33,7 +33,7 @@ end
 
 function resetplayer()
 	if #nmesatt==0 then
-		player.alive=true				
+		player.alive=true			
 		player.t=1
 		player.x=63
 		player.y=112
@@ -44,16 +44,19 @@ function resetplayer()
 end
 
 function playerdeath()
+	
 	if not invince then
+		printh("Player Died: #nmesatt="..#nmesatt..", #nmescap="..#nmescap..", player.lives="..player.lives..", nmealive="..tostr(nmealive)..", playfieldnmes="..playfieldnmes,"log.txt")
 		sfx(2,2)  -- player explode sound
 		player.alive=false
+		player.lives-=1
 		add(explosions,{x=player.x,y=player.y,t=1})
 
-		if player.lives<1 then
-			gamephase=0
+		if player.lives<0 then
+			--gamephase=0
 			gameover=true
-		else 		
-			lastgamephase=gamephase
+		--else 		
+			--lastgamephase=gamephase
 		end				
 		player.animlock=false
 		player.t=2	

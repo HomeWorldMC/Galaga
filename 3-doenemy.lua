@@ -235,10 +235,10 @@ function findemptyslot(t)
 			local r=mothslots[n][1]
 			local c=mothslots[n][2] 
 			local slot=playfield[r][c]
-			printh("n="..n,"log.txt")
+			--printh("n="..n,"log.txt")
 			if slot.holdslot==false and slot.canwrite==true then 
 				slot.holdslot=true
-				printh("----typ=1, r="..r..",c:"..c,"log.txt")
+				--printh("----typ=1, r="..r..",c:"..c,"log.txt")
 				return slot
 			end
 		end
@@ -249,10 +249,10 @@ function findemptyslot(t)
 			local r=beeslots[n][1]
 			local c=beeslots[n][2]
 			local slot=playfield[r][c]
-			printh("n="..n,"log.txt")
+			--printh("n="..n,"log.txt")
 			if slot.holdslot==false and slot.canwrite==true then 
 				slot.holdslot=true
-				printh("----typ=2, r="..r..",c:"..c,"log.txt")
+				--printh("----typ=2, r="..r..",c:"..c,"log.txt")
 				return slot
 			end
 		end
@@ -263,10 +263,10 @@ function findemptyslot(t)
 			local r=bossslots[n][1]
 			local c=bossslots[n][2]
 			local slot=playfield[r][c]
-			printh("n="..n,"log.txt")
+			--printh("n="..n,"log.txt")
 			if slot.holdslot==false and slot.canwrite==true then 
 				slot.holdslot=true
-				printh("----typ=3, r="..r..",c:"..c,"log.txt")
+				--("----typ=3, r="..r..",c:"..c,"log.txt")
 				return slot
 			end
 		end
@@ -281,7 +281,7 @@ function findemptyslot(t)
 	--		end
 	--	end	
 	--end
-	printh("should never get here","log.txt")
+	--printh("should never get here","log.txt")
 	return nil
 end
 
@@ -512,7 +512,7 @@ function docapture()
 						tonode={x=slot.x,y=slot.y}				
 					else 
 						tonode=path[nme.index+1]
-						printh("fromnode:{x="..fromnode.x..",y="..fromnode.y.."}. tonode:{x="..tonode.x..",y="..tonode.y.."}.","log.txt")
+						--("fromnode:{x="..fromnode.x..",y="..fromnode.y.."}. tonode:{x="..tonode.x..",y="..tonode.y.."}.","log.txt")
 					end
 					
 					nme.ph = atan2( (fromnode.x-tonode.x), (fromnode.y-tonode.y) )
@@ -521,12 +521,12 @@ function docapture()
 					nme.ax=tonode.x
 					nme.ay=tonode.y
 					
-					printh("first time - nme:{ax="..nme.ax..",ay="..nme.ay.."}. nme:{x="..nme.x..",y="..nme.y.."}.","log.txt")
+					--printh("first time - nme:{ax="..nme.ax..",ay="..nme.ay.."}. nme:{x="..nme.x..",y="..nme.y.."}.","log.txt")
 				else 
 					dx=nme.ax-nme.x
 					dy=nme.ay-nme.y
 
-					printh("nme:{ax="..nme.ax..",ay="..nme.ay.."}. nme:{x="..nme.x..",y="..nme.y.."}.","log.txt")
+					--printh("nme:{ax="..nme.ax..",ay="..nme.ay.."}. nme:{x="..nme.x..",y="..nme.y.."}.","log.txt")
 				
 					dist = sqrt(dx*dx + dy*dy)
 				

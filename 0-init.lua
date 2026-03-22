@@ -7,7 +7,7 @@ function _init()
 
 	initialiseconstants()
 	
-	invince=true
+	invince=false
 	if invince then
 		maxrounds=5
 		musicstart=3

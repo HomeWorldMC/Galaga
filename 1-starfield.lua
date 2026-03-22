@@ -3,7 +3,7 @@ function dostarfield()
 		pset(s.x,s.y,s.col)
 	end
 	
-	if gamephase>=1 then
+	if gamephase>=2 then
 		blink+=0.35
 		if blink>10.95 then blink=0 end
 		if blink>=0 and blink<6 then
@@ -16,7 +16,7 @@ end
 
 function animatestars()
 	for s in all(stars) do
-		if gamephase==1 then
+		if gamephase<=1 then
 			s.y+=(s.spd/4)*-1
 			if s.y<1 then
 				s.y = 126

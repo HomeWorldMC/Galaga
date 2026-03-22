@@ -7,7 +7,7 @@ function _init()
 
 	initialiseconstants()
 	
-	invince=true
+	invince=false
 	if invince then
 		maxrounds=5
 		musicstart=3
@@ -55,7 +55,6 @@ function _init()
 	musicstate=-1
 	sfxon=false
 	jankymusictimer=0
-	pausetimer=2
 	stagekills=0
 	bon=0		
 	ischallengingstage=false
@@ -63,6 +62,7 @@ function _init()
 	shipspeedx=1.25
 	wavesetval=1
 	playfieldnmes=0
+	pausetimer=2
 
 	tractoron=false
 	tractorendtimer=2
@@ -102,13 +102,11 @@ function _update60()
 		end
 	end
 
-
-
-	if (gamephase==2 or gamephase==3 or gamephase==4 or gamephase==6 or gamephase==7) and player.alive then
+	if (gamephase==1 or gamephase==2 or gamephase==3 or gamephase==4 or gamephase==6 or gamephase==7) and player.alive then
 		controls()	
 	else
 		getshieldnumbers()
-		if btnp(🅾️) and gamephase==0 then
+		if btnp(🅾️) and (gamephase==0 or gamephase==8) then
 			gamephase=1
 		end
 	end
@@ -146,6 +144,8 @@ function _update60()
 		end
 	elseif gamephase==2 then -- first wave attacks		
 		maingame()
+		prepwaves()
+		
 		if nmewavenmes==0 then -- all wave enemies defeated or moved to the playfield. 
 			if wavecounter==#nmewavequeue then	-- all waves completed. move to formation attack phase (game phase 3)
 				if not ischallengingstage then
@@ -154,7 +154,7 @@ function _update60()
 						gamephase=6
 						swapgamephase=3
 						dolog("gamephase-info-to")
-						after(0.25, function()
+						after(0, function()
 							gamephase=swapgamephase
 							dolog("gamephase-info-switched")
 						end)
@@ -178,7 +178,7 @@ function _update60()
 				gamephase=6
 				swapgamephase=5
 				dolog("gamephase-info-to")
-				after(1.5, function() 
+				after(1.5, function()
 					gamephase=swapgamephase
 					dolog("gamephase-info-switched")
 				end)
@@ -186,33 +186,8 @@ function _update60()
 			end
 		end
 
-		pausetimer-=0.1
-		if pausetimer<=0 then
-			wavetimer-=0.35
-			if wavetimer<=0 and wavecounter<=#nmewavequeue then	
-				local wave=nmewavequeue[wavecounter]
-				if wave[2] ~= nil and #wave[2]>0 then	
-					for i=1,wave[1] do
-						local nme=wave[2][1]
-						add(twave, nme)
-						del(wave[2],nme)
-					end
-					wavetimer=3				
-				end
+		
 
-				if #twave<=0 then
-					if wavecounter~=#nmewavequeue then
-						wavecounter+=1
-					end
-					firesduringwave=0
-					if ischallengingstage then
-						pausetimer=5
-					else
-						pausetimer=3	
-					end
-				end
-			end	
-		end	
 	elseif gamephase==3 then --- formation attacks
 		maingame()
 		if musicswitch then
@@ -282,7 +257,14 @@ function _update60()
 	elseif gamephase==5 then -- player dead
 		maingame()
 		if player.lives<0 then
-
+			dolog("gamephase-info-moving")
+			gamephase=6
+			swapgamephase=8
+			dolog("gamephase-info-to")
+			after(0, function()
+				gamephase=swapgamephase
+				dolog("gamephase-info-switched")
+			end)
 		else
 			if #nmesatt==0 then
 				player.x=63
@@ -309,7 +291,7 @@ function _update60()
 		stageUI()		
 		setstageicons()
 		setlivesicons()
-		if stagesfx then
+		if stagesfx and stage>1 then
 			if ischallengingstage then	
 				music(4)
 			else
@@ -317,6 +299,11 @@ function _update60()
 			end
 			stagesfx=false
 		end
+	end
+
+	if gamephase==8 then -- game over
+		maingame()
+		startscreen()
 	end
 
 	if gamephase>1 then
@@ -328,17 +315,10 @@ end
 function _draw()
 	cls(0)
 	dostarfield()	
-
-	--if nmesatt~=nil then print("#nmesatt:"..tostr(#nmesatt), 5,80,7) end
-	--if nmescap~=nil then print("#nmescap:"..tostr(#nmescap), 5,90,7) end
-	--print("gamephase:"..tostr(gamephase), 5,100,7)
-	--print("swapgamephase:"..tostr(swapgamephase), 5,110,7)
 	
-	if gamephase==0 or gamephase==1 then
+	if gamephase==0 or gamephase==1 or gamephase==8 then
 		startscreen()
-	end		
-	
-	
+	end
 
 	rect(0,0,127,127,7)
 	flush_drawq()
@@ -389,7 +369,8 @@ function controls()
 	end
 	
 	if btnp(❎) then
-		if (gamephase==2 or gamephase==3 or (gamephase==6 and swapgamephase==2) or (gamephase==6 and swapgamephase==3)) then
+		--if (gamephase==2 or gamephase==3 or (gamephase==6 and swapgamephase==2) or (gamephase==6 and swapgamephase==3)) then
+		if player.alive and rounds~=nil then
 			fire=1
 		end
 	end
@@ -412,7 +393,7 @@ function startgame()
 	music(musicstart)
 	
 	player={x=63,y=112,lives=2,alive=true,t=0,f=1,animlock=1,score=0}
-	playerlifetimer=7
+	--playerlifetimer=7
 	gameover=false
 	firsttime=false
 	stage=1
@@ -639,25 +620,33 @@ function flush_printq()
 end
 
 function startscreen()
+	local x=32
+	local y=20
 	local xoff=0
 	local yoff=0
+	local ymov=0
+
+	if gamephase==8 then
+		ymov=46
+	end
+
 	for li=1,#logo do			
-		spr(logo[li],32+xoff,20+yoff)
+		spr(logo[li],x+xoff,y+yoff+ymov)
 		xoff+=8
 		if xoff>=64 then
 			xoff=0
 			yoff+=8
 		end
 	end
-	print("rEMADE",49,39,13)
-	print("bY",58,45,13)
-	print("tEX",67,45,13)
-	if gamephase==0 then
+	print("rEMADE",49,39+ymov,13)
+	print("bY",58,45+ymov,13)
+	print("tEX",67,45+ymov,13)
+	if gamephase==0 or gamephase==8 then
 		if firsttime then
-			print("[press start to play]", 22,100,textcol)
+			print("[press start to play]", 22,113,textcol)
 		else
-			print("game over", 45,93,textcol)
-			print("[press start to play again]", 10,100,textcol)
+			print("game over", 45,106,textcol)
+			print("[press start to play again]", 10,113,textcol)
 		end	
 	end
 end
@@ -681,6 +670,36 @@ function maingame()
 	doexplosions()
 	animateplayerrounds(rounds,2,-1)
 	animateenemyrounds(nmerounds,18,1) 
+end
+
+function prepwaves()
+	pausetimer-=0.1
+	if pausetimer<=0 then
+		wavetimer-=0.35
+		if wavetimer<=0 and wavecounter<=#nmewavequeue then	
+			local wave=nmewavequeue[wavecounter]
+			if wave[2] ~= nil and #wave[2]>0 then	
+				for i=1,wave[1] do
+					local nme=wave[2][1]
+					add(twave, nme)
+					del(wave[2],nme)
+				end
+				wavetimer=3				
+			end
+
+			if #twave<=0 then
+				if wavecounter~=#nmewavequeue then
+					wavecounter+=1
+				end
+				firesduringwave=0
+				if ischallengingstage then
+					pausetimer=5
+				else
+					pausetimer=3	
+				end
+			end
+		end
+	end
 end
 
 function dolog(num)

@@ -20,7 +20,7 @@ function doenemy()
 				playfield[r][c].nme.x=playfield[r][c].x
 
 				-- check to see if nme does attack run
-				if beginruntimer<0 and flr(rnd(nmecount*5)+1)==1 and #nmesatt<3 and playfield[r][c].nme.mode==0 and player.alive and gamephase==3 then
+				if beginruntimer<0 and flr(rnd(nmecount*4)+1)==1 and #nmesatt<3 and playfield[r][c].nme.mode==0 and player.alive and gamephase==3 then
 					beginruntimer=4
 					playfield[r][c].nme.mode=1
 					playfield[r][c].nme.ax=playfield[r][c].nme.x
@@ -187,47 +187,6 @@ function destroynme(nme)
 	del(nmesatt,nme)
 	freelifecheck()	
 end
-
---function endattackrun(nmeatt, cw)
---	local col=findnextslot(nmeatt.row,nmeatt.col,true)
---	
---	if col>0 then
---		local pfslot=playfield[nmeatt.row][col]
---		
---		if pfslot.canwrite then
---			nmeatt.x=pfslot.x
---			nmeatt.y=pfslot.y
---			nmeatt.ax=pfslot.x
---			nmeatt.ay=pfslot.y
---			nmeatt.mode=0
---			nmeatt.col=col
---			
---			if not cw then
---				pfslot.nme=nmeatt	
---			end
---			
---			pfslot.canwrite=cw
---		end
---		return true
---	else
---		return false
---	end
---end
-
---function findnextslot(row,ocol,st)
---	if st then
---		if playfield[row][ocol].canwrite and playfield[row][ocol].x>=fieldboundmin and playfield[row][ocol].x<=fieldboundmax then
---			return ocol
---		end
---	end
---
---	for col=1,#playfield[row] do
---		if playfield[row][col].canwrite and playfield[row][col].x>=fieldboundmin and playfield[row][col].x<=fieldboundmax then
---			return col
---		end
---	end	
---	return -1
---end
 
 function findemptyslot(t)
 	if t==1 then

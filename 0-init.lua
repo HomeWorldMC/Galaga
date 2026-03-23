@@ -578,6 +578,7 @@ function drawtractorbeam(offx,offy)
 	pal(11,c2,1)
 	pal(15,c3,1)
 
+
 	--queue_rectfill(offx,offy+trmov,offx+24,offy+40,0)
 
 	trmov+=0.35*trdir

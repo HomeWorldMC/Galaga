@@ -90,7 +90,7 @@ function doenemy()
 		end
 	end
 
-	doenemyhit()
+	--doenemyhit()
 end
 
 function nmeattacking()

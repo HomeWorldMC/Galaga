@@ -1,13 +1,12 @@
 pico-8 cartridge // http://www.pico-8.com
 version 43
 __lua__
-#include constants.lua
 #include 0-init.lua
 #include 1-starfield.lua
 #include 2-firelaser.lua
 #include 3-doenemy.lua
 #include 4-doplayer.lua
-#include 5-donmeexplosions.lua
+#include 5-constants.lua
 __gfx__
 0000000000070000c0000000000000000000000000000000008000000000a0000000000000000000000000008eeeeee09aaaaaa0677777700000000000000000
 0000000000070000700000000000000000000000000800000000a0000000000000000000888800001cccccc08e9aaee09dcccaa068e778e00000000000000000

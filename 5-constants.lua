@@ -28,15 +28,13 @@ function initialiseconstants()
     typ={3,1,1,2,2}
 	hp={2,1,1,1,1}
 
-	logo={67,68,69,70,71,72,73,74,
-	83,84,85,86,87,88,89,90,
-	99,100,101,102,103,104,105,106}
 	nmescores={5,5,20}
 	freelifescores={2000,3800,5800,8000,10400,13000,15800,18800,22000,25400,29000,32800,36800,40000}
 	nmehitboxwidth=7	
 	fieldboundmin=2
 	fieldboundmax=120	
 	explosionsframes={3,4,5,6,7}
+	playerexplosionframes={115,117,119,121}
 	explosionspd=0.4	
 	stageiconsprites={8,9,10,11,12,13}	
 	nmetype1frames={32,33}

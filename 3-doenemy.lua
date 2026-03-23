@@ -52,7 +52,7 @@ function doenemy()
 	if #nmesatt>0 then nmeattacking() end
 	--nmecapture()
 	docapture()
-	doenemyhit()
+	
 
 	nmealive=false
 	

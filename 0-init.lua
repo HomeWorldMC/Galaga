@@ -419,6 +419,7 @@ function initialisestage()
 	nmescap={}	
 	nmewavequeue={}
 	explosions={}
+	playerexplosion=0
 	nmealive=true
 	nmecount=40
 	beginruntimer=0
@@ -500,6 +501,7 @@ function resetvars()
 	nmesatt={}
 	nmescap={}
 	explosions={}
+	playerexplosion=0
 	nmecount=40
 	beginruntimer=0
 	playfield={}
@@ -531,6 +533,16 @@ function doexplosions()
 		explosions[n].t+=explosionspd
 		if explosions[n].t>(6-explosionspd) then
 			del(explosions,explosions[n])
+		end
+	end
+end
+
+function doplayerexplosion()	
+	if playerexplosion~=0 then
+		queue_spr(playerexplosionframes[flr(playerexplosion.t)],playerexplosion.x-5,playerexplosion.y-3,2,2,false,false)
+		playerexplosion.t+=(explosionspd/3)
+		if playerexplosion.t>(5-explosionspd) then
+			playerexplosion=0
 		end
 	end
 end
@@ -578,9 +590,6 @@ function drawtractorbeam(offx,offy)
 	pal(11,c2,1)
 	pal(15,c3,1)
 
-
-	--queue_rectfill(offx,offy+trmov,offx+24,offy+40,0)
-
 	trmov+=0.35*trdir
 	if trmov>40  then 		
 		tractorendtimer-=0.075
@@ -621,20 +630,6 @@ function queue_prt(txt, x, y, col)
   })
 end
 
-function queue_rectfill(a,b,c,d,e)	
-	add(rectfillqueue, {
-		x1=a, y1=b, x2=c, y2=d, col=e
-  	})
-end
-
-function flush_rectfillq()
-  for d in all(rectfillqueue) do
-	rectfill(d.x1,d.y1,d.x2,d.y2,d.col)
-	--queue_prt("rectfill: x1="..x1..",y1="..y1..",x2="..x2..",y2="..y2..",col="..col,5,60,70)
-  end
-  rectfillqueue = {}
-end
-
 function flush_drawqt()
   for d in all(tractorqueue) do
     sspr(d.sx, d.sy, d.sw, d.sh, d.dx, d.dy, d.dw, d.dh)
@@ -667,14 +662,8 @@ function startscreen()
 		ymov=46
 	end
 
-	for li=1,#logo do			
-		spr(logo[li],x+xoff,y+yoff+ymov)
-		xoff+=8
-		if xoff>=64 then
-			xoff=0
-			yoff+=8
-		end
-	end
+	queue_sspr(24, 32, 64, 24, x, y+ymov, 64,24)
+
 	print("rEMADE",49,39+ymov,13)
 	print("bY",58,45+ymov,13)
 	print("tEX",67,45+ymov,13)
@@ -704,9 +693,11 @@ function maingame()
 	if gamephase~=5 then
 		doplayer()
 	end
-	doexplosions()
-	animateplayerrounds(rounds,2,-1)
-	animateenemyrounds(nmerounds,18,1) 
+	--doexplosions()
+	--doplayerexplosion()
+
+	animateplayerrounds(rounds,1,-1)
+	animateenemyrounds(nmerounds,2,1) 
 end
 
 function prepwaves()

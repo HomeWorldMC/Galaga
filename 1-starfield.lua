@@ -50,7 +50,7 @@ function setlivesicons()
 	local sx=2
 	for i=1,player.lives do
 		--spr(1,sx,118)
-		queue_spr(1,sx,118,1,1,false,false)
+		queue_spr(16,sx,118,1,1,false,false)
 		sx+=8
 	end
 

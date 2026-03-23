@@ -23,11 +23,11 @@ function animateenemyrounds(rnds,sp,dir)
 	for i in all(rnds) do
 		i.x += i.vx
 		i.y += i.vy
-		
+		queue_spr(sp,i.x-1,i.y-5,1,1,false,false)
 		if i.x < 0 or i.x > 128 or i.y>132 or i.y<0 then
 			del(rnds,i)
 		end
-		queue_spr(sp,i.x-1,i.y-5,1,1,false,false)
+		
 		--spr(sp,i.x-1,i.y-5)
 	end
 end

@@ -20,7 +20,9 @@ function doenemy()
 				playfield[r][c].nme.x=playfield[r][c].x
 
 				-- check to see if nme does attack run
-				if beginruntimer<0 and flr(rnd(nmecount*4)+1)==1 and #nmesatt<3 and playfield[r][c].nme.mode==0 and player.alive and gamephase==3 then
+				if beginruntimer<0 and flr(rnd(nmecount*4)+1)==1 and #nmesatt<3 and playfield[r][c].nme.mode==0 
+					and player.alive and gamephase==3 and not disableplayer then
+						
 					beginruntimer=4
 					playfield[r][c].nme.mode=1
 					playfield[r][c].nme.ax=playfield[r][c].nme.x
@@ -29,7 +31,7 @@ function doenemy()
 
 					if playfield[r][c].nme.typ==3 and #nmescap==0 and flr(rnd(2))==0 and not triedcapturethisstage then
 						add(nmescap,playfield[r][c].nme)
-						triedcapturethisstage=true					
+						--triedcapturethisstage=true					
 					else
 						add(nmesatt,playfield[r][c].nme)
 						doenemyfireroll(playfield[r][c].nme,true,0,70)
@@ -310,11 +312,7 @@ function drawrotatesprite(ang,x,y,nme)
 		{frs[5],false,false},
 		{frs[6],false,false}
 	}
-
-	--spr(fram[index][1],x,y,1,1,fram[index][2],fram[index][3])
-	--add(s=fram[index][1],x=x,y=y,w=1,h=1,flipx=fram[index][2],flipy=fram[index][3])
 	queue_spr(fram[index][1],x,y,1,1,fram[index][2],fram[index][3])
-	--print(tostr(fram[index][1]),x,y+9,7)
 end
 
 function dowave()
@@ -524,7 +522,7 @@ function docapture()
 				end
 			else
 				nme.ph=0.25	
-				drawtractorbeam(nme.x-7,nme.y+8)	
+				dotractorbeam(nme.x-7,nme.y+8)	
 				
 			end					
 		else			

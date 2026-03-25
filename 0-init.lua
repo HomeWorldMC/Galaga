@@ -19,9 +19,14 @@ function _init()
 	end
 		
 	timers={}
+	cycletimers={}
 
 	function after(duration,callback)
-		add(timers, {t=0,d=duration, cb=callback})
+		add(timers, {t=0, d=duration, cb=callback})
+	end
+
+	function cycle(rotations,spd,callback)
+		add(cycletimers, {ang=0, r=rotations, s=spd, cb=callback})
 	end
 
 	function update_timers(dt)
@@ -34,6 +39,21 @@ function _init()
 		end
 	end
 	
+	function update_cycletimers()
+		for ct in all(cycletimers) do
+			ct.ang+=ct.s
+			if ct.ang>1 then
+				ct.ang=0
+				ct.r-=1
+			end
+			if ct.r<1 then
+				del(cycletimers, ct)
+				player.f=16
+			else
+				ct.cb(ct.ang,ct.r)
+			end			
+		end
+	end
 
 	-- Vars
 	blink=0	
@@ -42,7 +62,7 @@ function _init()
 	freelivesgiven=1
 	gamephase=0
 	gameover=true
-	player={x=63,y=112,lives=2,alive=true,t=0,f=1,animlock=1,score=0}
+	player={x=63,y=112,lives=2,alive=true,t=0,f=16,animlock=1,score=0}
 	nmewavespd=1.75
 	wavetimer=3
 	wavecounter=1
@@ -65,13 +85,15 @@ function _init()
 	pausetimer=2
 
 	tractoron=false
-	tractorendtimer=2
+	tractorendtimer=10
 
 	tractorfx=8
 
 	musicswitch=false
 	challengingmusicswitch=false
 	stagesfx=false
+
+	disableplayer=false
 	
 	tcol=1
 
@@ -83,7 +105,7 @@ function _init()
 	drawqueue={}
 	tractorqueue={}
 	printqueue={}
-	rectfillqueue={}
+	rectqueue={}
 	swapgamephase=6
 
 	endofstage=false
@@ -93,6 +115,7 @@ end
 
 function _update60()
 	update_timers(1/30)
+	update_cycletimers(1/30)
 
 	musicstate=stat(24)
 
@@ -104,7 +127,7 @@ function _update60()
 		end
 	end
 
-	if (gamephase==1 or gamephase==2 or gamephase==3 or gamephase==4 or gamephase==6 or gamephase==7) and player.alive then
+	if (gamephase==1 or gamephase==2 or gamephase==3 or gamephase==4 or gamephase==6 or gamephase==7) and player.alive and not disableplayer then
 		controls()	
 	else
 		getshieldnumbers()
@@ -325,6 +348,8 @@ function _draw()
 	--flush_rectfillq()
 	flush_drawq()
 	flush_drawqt()
+	flush_rectq()
+	flush_printq()
 
 	if gamephase==0 or gamephase==1 or gamephase==8 then
 		startscreen()
@@ -403,7 +428,7 @@ function startgame()
 	--sfx(4,0) -- start game sound
 	music(musicstart)
 	
-	player={x=63,y=112,lives=2,alive=true,t=0,f=1,animlock=1,score=0}
+	player={x=63,y=112,lives=2,alive=true,t=0,f=16,animlock=1,score=0}
 	--playerlifetimer=7
 	gameover=false
 	firsttime=false
@@ -571,10 +596,10 @@ function resettractor()
 	tractorfx=8
 	trdir=1
 	trmov=5
-	tractorendtimer=2
+	tractorendtimer=10
 end
 
-function drawtractorbeam(offx,offy)
+function dotractorbeam(offx,offy)
 	tractorfx=8
 	queue_sspr(0, 32, 24, trmov, offx, offy, 24, trmov)
 
@@ -598,15 +623,39 @@ function drawtractorbeam(offx,offy)
 			musicswitch=true
 			trdir=-1 
 			trmov=40
+		else
+			trmov=41
+		end	
+
+		if dorectoverlapcollision(player.x,player.y,offx,offy,8,8,22,39) and not disableplayer and tractoron then
+			--player.f=23
+			disableplayer=true
+			cycle(4, 0.02, function(ang, r) 
+				player.f=drawplayersprite(ang,player.x,player.y)
+			end)
 		end
 	end
+	
 	if trmov<5  then 
 		tractoron=false 
 		trdir=1
 		trmov=5
-		tractorendtimer=2
+		tractorendtimer=10
+		player.f=16
+		disableplayer=false
 	end
 	
+end
+
+function spinplayersprite()
+
+
+end
+
+function queue_rect(x1,y1,x2,y2,col)
+	add(rectqueue, {
+		x1=x1,y1=y1,x2=x2,y2=y2,col=col
+	})
 end
 
 function queue_spr(n, x, y, w, h, flip_x, flip_y)
@@ -649,6 +698,13 @@ function flush_printq()
 	print(d.t,d.x,d.y,d.c)
   end
   printqueue = {}
+end
+
+function flush_rectq()
+	for r in all(rectqueue) do
+		rect(r.x1,r.y1,r.x2,r.y2,r.col)
+	end
+	rectqueue = {}
 end
 
 function startscreen()

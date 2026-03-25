@@ -599,7 +599,7 @@ function resettractor()
 	tractorendtimer=10
 end
 
-function dotractorbeam(offx,offy)
+function dotractorbeam(offx,offy,nme)
 	tractorfx=8
 	queue_sspr(0, 32, 24, trmov, offx, offy, 24, trmov)
 
@@ -643,6 +643,10 @@ function dotractorbeam(offx,offy)
 		tractorendtimer=10
 		player.f=16
 		disableplayer=false
+		cycle(3,0.025, function(ang,r)
+			queue_prt("i'll get you ", nme.x-20,nme.y+10,7)
+			queue_prt("  soon lol", nme.x-20,nme.y+15,7)
+		end)
 	end
 	
 end

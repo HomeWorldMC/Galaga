@@ -1,24 +1,8 @@
 function doplayer()
-	local pf={16,3,4,5,6,7,0}
-	local f
-	
-	
 	doenemyhit()
-	
-	if not player.alive and not gameover then
-		if not player.animlock then
-			player.t+=0.1
-			if player.t>7.9 then
-				player.animlock=true
-			end		
-			
-			f=pf[flr(player.t)]		
-		end
-	elseif player.alive then
-		f=16
+	if player.alive then
+		queue_spr(16,player.x,player.y,1,1,false,false)
 	end
-	queue_spr(f,player.x,player.y,1,1,false,false)
-	--spr(f,player.x,player.y)
 end
 
 function doenemyhit()	
@@ -50,15 +34,11 @@ function playerdeath()
 		sfx(2,2)  -- player explode sound
 		player.alive=false
 		player.lives-=1
-		--playerexplosion={x=player.x,y=player.y,t=1}
+		playerexplosion={x=player.x,y=player.y,t=1}
 
 		if player.lives<0 then
-			--gamephase=0
 			gameover=true
-		--else 		
-			--lastgamephase=gamephase
 		end				
-		player.animlock=false
 		player.t=2	
 	end
 end

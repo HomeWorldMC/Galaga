@@ -693,8 +693,8 @@ function maingame()
 	if gamephase~=5 then
 		doplayer()
 	end
-	--doexplosions()
-	--doplayerexplosion()
+	doexplosions()
+	doplayerexplosion()
 
 	animateplayerrounds(rounds,1,-1)
 	animateenemyrounds(nmerounds,2,1) 

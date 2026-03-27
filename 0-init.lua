@@ -20,6 +20,7 @@ function _init()
 		
 	timers={}
 	cycletimers={}
+	movetimers={}
 
 	-- Vars
 	blink=0	
@@ -28,7 +29,7 @@ function _init()
 	freelivesgiven=1
 	gamephase=0
 	gameover=true
-	player={x=63,y=112,lives=2,alive=true,t=0,f=16,animlock=1,score=0}
+	player={x=63,y=112,lives=2,alive=true,t=0,f=16,animlock=1,score=0, captured=false, capturedby=nil}
 	nmewavespd=1.75
 	wavetimer=3
 	wavecounter=1
@@ -76,12 +77,16 @@ function _init()
 
 	endofstage=false
 
+	--testsprite={x=10,y=10,s=10}
+	--move({x=100,y=100}, testsprite)
+
 	initialisestars()
 end
 
 function _update60()
 	update_timers(1/30)
 	update_cycletimers(1/30)
+	update_movetimers(1/30)
 
 	musicstate=stat(24)
 
@@ -310,6 +315,12 @@ function _draw()
 	cls(0)
 	dostarfield()
 
+	if player.captured and #movetimers < 1 then
+		player.x = player.capturedby.x+1
+		player.y = player.capturedby.y+7
+		print("#movetimers"..#movetimers,10,30,7)
+	end
+
 	
 	--flush_rectfillq()
 	flush_drawq()
@@ -323,6 +334,7 @@ function _draw()
 
 	rect(0,0,127,127,7)
 
+	
 
 	flush_printq()
 end
@@ -394,7 +406,7 @@ function startgame()
 	--sfx(4,0) -- start game sound
 	music(musicstart)
 	
-	player={x=63,y=112,lives=2,alive=true,t=0,f=16,animlock=1,score=0}
+	player={x=63,y=112,lives=2,alive=true,t=0,f=16,animlock=1,score=0,captured=false, capturedby=nil}
 	--playerlifetimer=7
 	gameover=false
 	firsttime=false
@@ -596,9 +608,13 @@ function dotractorbeam(offx,offy,nme)
 		if dorectoverlapcollision(player.x,player.y,offx+6,offy,6,8,10,39) and not disableplayer and tractoron then
 			--player.f=23
 			disableplayer=true
-			cycle(4, 0.02, function(ang, r) 
+			player.captured = true
+			player.capturedby = nme
+			cycle(3, 0.02, function(ang, r) 
 				player.f=drawplayersprite(ang,player.x,player.y)
 			end)
+			move({x=player.x,y=player.y},{x=nme.x+1,y=player.y-8})
+			move({x=nme.x+1,y=player.y-8},{x=nme.x+1,y=nme.y+7})
 		end
 	end
 	
@@ -607,12 +623,12 @@ function dotractorbeam(offx,offy,nme)
 		trdir=1
 		trmov=5
 		tractorendtimer=10
-		player.f=16
-		disableplayer=false
-		cycle(3,0.025, function(ang,r)
-			queue_prt("i'll get you ", nme.x-20,nme.y+10,7)
-			queue_prt("  soon lol", nme.x-20,nme.y+16,7)
-		end)
+		if not player.captured then
+			player.f=16
+		else
+			player.f=23
+		end
+		disableplayer=false			
 	end
 	
 end

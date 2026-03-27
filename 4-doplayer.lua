@@ -64,8 +64,8 @@ end
 function dorectoverlapcollision(ax,ay,bx,by,asizex,asizey,bsizex,bsizey)
 	a={x1=ax, y1=ay, x2=ax+asizex, y2=ay+asizey}
 	b={x1=bx, y1=by, x2=bx+bsizex, y2=by+bsizey}
-	queue_rect(ax,ay,ax+asizex,ay+asizey,7)
-	queue_rect(bx,by,bx+bsizex,by+bsizey,12)
+	--queue_rect(ax,ay,ax+asizex,ay+asizey,7)
+	--queue_rect(bx,by,bx+bsizex,by+bsizey,12)
 
 	return not (
 		a.x2 < b.x1 or

@@ -7,7 +7,7 @@ function _init()
 
 	initialiseconstants()
 	
-	invince=false
+	invince=true
 	if invince then
 		maxrounds=5
 		musicstart=3
@@ -20,40 +20,6 @@ function _init()
 		
 	timers={}
 	cycletimers={}
-
-	function after(duration,callback)
-		add(timers, {t=0, d=duration, cb=callback})
-	end
-
-	function cycle(rotations,spd,callback)
-		add(cycletimers, {ang=0, r=rotations, s=spd, cb=callback})
-	end
-
-	function update_timers(dt)
-		for t in all(timers) do
-			t.t += dt
-			if t.t >= t.d then
-			t.cb()
-			del(timers, t)
-			end
-		end
-	end
-	
-	function update_cycletimers()
-		for ct in all(cycletimers) do
-			ct.ang+=ct.s
-			if ct.ang>1 then
-				ct.ang=0
-				ct.r-=1
-			end
-			if ct.r<1 then
-				del(cycletimers, ct)
-				player.f=16
-			else
-				ct.cb(ct.ang,ct.r)
-			end			
-		end
-	end
 
 	-- Vars
 	blink=0	
@@ -627,7 +593,7 @@ function dotractorbeam(offx,offy,nme)
 			trmov=41
 		end	
 
-		if dorectoverlapcollision(player.x,player.y,offx,offy,8,8,22,39) and not disableplayer and tractoron then
+		if dorectoverlapcollision(player.x,player.y,offx+6,offy,6,8,10,39) and not disableplayer and tractoron then
 			--player.f=23
 			disableplayer=true
 			cycle(4, 0.02, function(ang, r) 
@@ -645,15 +611,10 @@ function dotractorbeam(offx,offy,nme)
 		disableplayer=false
 		cycle(3,0.025, function(ang,r)
 			queue_prt("i'll get you ", nme.x-20,nme.y+10,7)
-			queue_prt("  soon lol", nme.x-20,nme.y+15,7)
+			queue_prt("  soon lol", nme.x-20,nme.y+16,7)
 		end)
 	end
 	
-end
-
-function spinplayersprite()
-
-
 end
 
 function queue_rect(x1,y1,x2,y2,col)

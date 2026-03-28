@@ -86,35 +86,37 @@ function dorectoverlapcollision(ax,ay,bx,by,asizex,asizey,bsizex,bsizey)
 	)
 end
 
-function drawplayersprite(ang,x,y)
+function drawplayersprite(ang,x,y,set)
+	local playersprites={{16,17,18,19,20,21,22},{23,24,25,26,27,28,29}}
+	
 	local index=flr(ang*24)+1
 	local fram={
-		{23,false,false},
-		{24,false,false},
-		{25,false,false},
-		{26,false,false},
-		{27,false,false},
-		{28,false,false},
-		{29,false,false},
+		{playersprites[set][1],false,false},
+		{playersprites[set][2],false,false},
+		{playersprites[set][3],false,false},
+		{playersprites[set][4],false,false},
+		{playersprites[set][5],false,false},
+		{playersprites[set][6],false,false},
+		{playersprites[set][7],false,false},
 
-		{28,false,true},
-		{27,false,true},
-		{26,false,true},
-		{25,false,true},
-		{24,false,true},
-		{23,false,true},
-		{24,true,true},
+		{playersprites[set][6],false,true},
+		{playersprites[set][5],false,true},
+		{playersprites[set][4],false,true},
+		{playersprites[set][3],false,true},
+		{playersprites[set][2],false,true},
+		{playersprites[set][1],false,true},
+		{playersprites[set][2],true,true},
 
-		{25,true,true},
-		{26,true,true},
-		{27,true,true},
-		{28,true,true},
-		{29,true,false},
-		{28,true,false},
-		{27,true,false},
-		{26,true,false},
-		{25,true,false},
-		{24,true,false}
+		{playersprites[set][3],true,true},
+		{playersprites[set][4],true,true},
+		{playersprites[set][5],true,true},
+		{playersprites[set][6],true,true},
+		{playersprites[set][7],true,false},
+		{playersprites[set][6],true,false},
+		{playersprites[set][5],true,false},
+		{playersprites[set][4],true,false},
+		{playersprites[set][3],true,false},
+		{playersprites[set][2],true,false}
 	}
 	queue_spr(fram[index][1],x,y,1,1,fram[index][2],fram[index][3])
 end

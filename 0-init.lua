@@ -7,7 +7,7 @@ function _init()
 
 	initialiseconstants()
 	
-	invince=false
+	invince=true
 	if invince then
 		maxrounds=5
 		musicstart=3
@@ -476,7 +476,7 @@ function buildstagenmewaves(wav)
 		
 		for nw=1, wav[1] do
 			nme={x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wav[2][ntindex],t=1,ph=0,sw=flr(rnd(2))*2-1,col=0,
-				row=0,mode=3,timer=3,dr=0.5,hp=hp,path=wav[3][ptindex],hascapture=false,index=1}
+				row=0,mode=3,timer=3,dr=0.5,hp=hp,path=wav[3][ptindex],hascapture=false,index=1,isimmortal=false}
 			add(wavset,nme)
 			
 			ntindex+=1
@@ -596,11 +596,16 @@ function dotractorbeam(offx,offy,nme)
 		end	
 
 		if dorectoverlapcollision(player.x,player.y,offx+6,offy,6,8,10,39) and not disableplayer and tractoron then
-			disableplayer=true
-			
+			disableplayer=true			
 
-			cycle(3, 0.02, function(ang, r)
-				player.f=drawplayersprite(ang,player.x,player.y)
+			cycle(4, 0.0266, function(ang, r)
+				local s
+				if r>2 then
+					s=1
+				else
+					s=2
+				end
+				player.f=drawplayersprite(ang,player.x,player.y, s)
 			end)
 			move({x=player.x,y=player.y},{x=nme.x+1,y=player.y-8})
 			move({x=nme.x+1,y=player.y-8},{x=nme.x+1,y=nme.y+7})

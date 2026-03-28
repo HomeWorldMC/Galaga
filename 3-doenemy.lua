@@ -31,7 +31,7 @@ function doenemy()
 
 					if playfield[r][c].nme.typ==3 and #nmescap==0 and flr(rnd(2))==0 and not triedcapturethisstage then
 						add(nmescap,playfield[r][c].nme)
-						--triedcapturethisstage=true					
+						triedcapturethisstage=true					
 					else
 						add(nmesatt,playfield[r][c].nme)
 						doenemyfireroll(playfield[r][c].nme,true,0,70)
@@ -66,7 +66,7 @@ function doenemy()
 				nmealive=true
 				if #rounds > 0 and (playfield[r][c].nme.mode==0 or playfield[r][c].nme.mode==1) then
 					for rds in all(rounds) do
-						if doboxcollision(playfield[r][c].nme.x,playfield[r][c].nme.y,rds.x,rds.y,nmehitboxwidth) then	
+						if doboxcollision(playfield[r][c].nme.x,playfield[r][c].nme.y,rds.x,rds.y,nmehitboxwidth) and not disableplayer then	
 							del(rounds,rds)
 							if playfield[r][c].nme.hp>1 then
 								playfield[r][c].nme.hp-=1
@@ -88,11 +88,12 @@ function doenemy()
 					end
 				end
 				drawsprite(playfield[r][c].nme,false)
+				if playfield[r][c].nme.hascapture then
+					queue_spr(31, playfield[r][c].nme.x+1, playfield[r][c].nme.y-9, 1, 1, false, false)
+				end
 			end
 		end
 	end
-
-	--doenemyhit()
 end
 
 function nmeattacking()
@@ -137,11 +138,6 @@ function nmeattacking()
 		if nmeatt.ay>128 then
 			local slot=playfield[nmeatt.row][nmeatt.col]
 
-			--if slot==nil then -- should never need this
-			--	slot=findemptyslot(nmeatt.typ)
-			--end
-			
-			--if slot.canwrite then
 			nmeatt.x=slot.x
 			nmeatt.y=slot.y
 			nmeatt.ax=slot.x
@@ -150,7 +146,7 @@ function nmeattacking()
 			
 			slot.nme=nmeatt	
 			slot.canwrite=false
-			--end
+
 			del(nmesatt,nmeatt)
 		end
 		
@@ -161,7 +157,7 @@ function nmeattacking()
 		
 		if #rounds > 0 then
 			for r in all(rounds) do
-				if doboxcollision(nmeatt.ax,nmeatt.ay,r.x,r.y,nmehitboxwidth) then
+				if doboxcollision(nmeatt.ax,nmeatt.ay,r.x,r.y,nmehitboxwidth) and not disableplayer then
 					--local pfslot=playfield[nmeatt.row][nmeatt.col].nmeatt
 
 					if nmeatt.hp>1 then
@@ -177,7 +173,9 @@ function nmeattacking()
 		end
 			
 		drawrotatesprite(ang,nmeatt.ax,nmeatt.ay,nmeatt)
-		
+		if nmeatt.hascapture then
+			queue_spr(23, nmeatt.ax+1, nmeatt.ay-9, 1, 1, false, false)
+		end
 	end	
 end
 
@@ -401,7 +399,7 @@ function dowave()
 		
 		if #rounds > 0 and nme.mode==3 then
 			for r in all(rounds) do
-				if doboxcollision(nme.x,nme.y,r.x,r.y,nmehitboxwidth) then
+				if doboxcollision(nme.x,nme.y,r.x,r.y,nmehitboxwidth) and not disableplayer then
 					--printh("nme.mode:" .. nme.mode, logfile)
 					del(rounds,r)
 					if nme.hp>1 then
@@ -522,8 +520,7 @@ function docapture()
 				end
 			else
 				nme.ph=0.25	
-				dotractorbeam(nme.x-7,nme.y+8,nme)	
-				
+				dotractorbeam(nme.x-7,nme.y+8,nme)
 			end					
 		else			
 			nme.index=7
@@ -533,7 +530,7 @@ function docapture()
 
 		if #rounds > 0 then
 			for r in all(rounds) do
-				if doboxcollision(nme.x,nme.y,r.x,r.y,nmehitboxwidth) then
+				if doboxcollision(nme.x,nme.y,r.x,r.y,nmehitboxwidth) and not disableplayer then
 					--local pfslot=playfield[nmeatt.row][nmeatt.col].nmeatt
 
 					if nme.hp>1 then
@@ -556,7 +553,9 @@ function docapture()
 		end
 
 		drawrotatesprite(nme.ph,nme.x,nme.y,nme)
-		
+		if nme.hascapture then
+			queue_spr(23, nme.x+1, nme.y+8, 1, 1, false, false)
+		end		
 	end
 end
 

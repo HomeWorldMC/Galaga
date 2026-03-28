@@ -7,7 +7,7 @@ function _init()
 
 	initialiseconstants()
 	
-	invince=true
+	invince=false
 	if invince then
 		maxrounds=5
 		musicstart=3
@@ -29,7 +29,7 @@ function _init()
 	freelivesgiven=1
 	gamephase=0
 	gameover=true
-	player={x=63,y=112,lives=2,alive=true,t=0,f=16,animlock=1,score=0, captured=false, capturedby=nil}
+	player={x=63,y=116,lives=2,alive=true,t=0,f=16,animlock=1,score=0}
 	nmewavespd=1.75
 	wavetimer=3
 	wavecounter=1
@@ -268,6 +268,8 @@ function _update60()
 			if #nmesatt==0 then
 				player.x=63
 				player.y=112
+				player.f=16
+				disableplayer=false
 				dolog("gamephase-info-moving")
 				gamephase=6
 				swapgamephase=lastgamephase
@@ -315,12 +317,7 @@ function _draw()
 	cls(0)
 	dostarfield()
 
-	if player.captured and #movetimers < 1 then
-		player.x = player.capturedby.x+1
-		player.y = player.capturedby.y+7
-		print("#movetimers"..#movetimers,10,30,7)
-	end
-
+	--print("gamephase:"..gamephase,5,30,7) 
 	
 	--flush_rectfillq()
 	flush_drawq()
@@ -406,7 +403,7 @@ function startgame()
 	--sfx(4,0) -- start game sound
 	music(musicstart)
 	
-	player={x=63,y=112,lives=2,alive=true,t=0,f=16,animlock=1,score=0,captured=false, capturedby=nil}
+	player={x=63,y=116,lives=2,alive=true,t=0,f=16,animlock=1,score=0,captured=false, capturedby=nil}
 	--playerlifetimer=7
 	gameover=false
 	firsttime=false
@@ -438,7 +435,7 @@ function initialisestage()
 	triedcapturethisstage=false
 
 	local nmex=12
-	local nmey=4
+	local nmey=8
 	
 	-- Create playfield
 	for r=1,5 do
@@ -464,19 +461,9 @@ function initialisestage()
 end
 
 function buildstagenmewaves(wav)
-	-- Wave construction rules
-	---- 1. If a wave has 2 nme paths, it WILL have 2 distinct path values - e.g. {"1a", "1b"}.
-	---- 2. If it has 2 nme paths, 2 nme types will be provided. Even if the types are the same - e.g. {1,1}.
-	---- 3. A wave with 2 paths will always have 4 ships per path
-
-	---{2,{1,2},{"1a","1b"}},
-	---{1,{3,1},{"3a","3a"}},
-	---{1,{1},{"3b","3b"}},
-	---{1,{2},{"1b","1b"}},
-	---{1,{2},{"1a","1a"}}
-
 	local wavset={}
 	local hp=1
+	local nme
 
 	ntindex=1
 	ptindex=1
@@ -486,7 +473,9 @@ function buildstagenmewaves(wav)
 		if wav[2][ntindex]==3 then hp=2 else hp=1 end
 		
 		for nw=1, wav[1] do
-			add(wavset,{x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wav[2][ntindex],t=1,ph=0,sw=flr(rnd(2))*2-1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=hp,path=wav[3][ptindex],index=1})
+			nme={x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wav[2][ntindex],t=1,ph=0,sw=flr(rnd(2))*2-1,col=0,
+				row=0,mode=3,timer=3,dr=0.5,hp=hp,path=wav[3][ptindex],hascapture=false,index=1}
+			add(wavset,nme)
 			
 			ntindex+=1
 			ptindex+=1
@@ -581,7 +570,6 @@ function dotractorbeam(offx,offy,nme)
 	tractorfx=8
 	queue_sspr(0, 32, 24, trmov, offx, offy, 24, trmov)
 
-
 	local c1=tcols1[flr(tcol)]
 	local c2=tcols2[flr(tcol)]
 	local c3=tcols3[flr(tcol)]
@@ -606,11 +594,10 @@ function dotractorbeam(offx,offy,nme)
 		end	
 
 		if dorectoverlapcollision(player.x,player.y,offx+6,offy,6,8,10,39) and not disableplayer and tractoron then
-			--player.f=23
 			disableplayer=true
-			player.captured = true
-			player.capturedby = nme
-			cycle(3, 0.02, function(ang, r) 
+			
+
+			cycle(3, 0.02, function(ang, r)
 				player.f=drawplayersprite(ang,player.x,player.y)
 			end)
 			move({x=player.x,y=player.y},{x=nme.x+1,y=player.y-8})
@@ -618,19 +605,18 @@ function dotractorbeam(offx,offy,nme)
 		end
 	end
 	
-	if trmov<5  then 
+	if trmov<5 then
 		tractoron=false 
 		trdir=1
 		trmov=5
 		tractorendtimer=10
-		if not player.captured then
-			player.f=16
-		else
-			player.f=23
+		-- do next fighter routines	
+		if disableplayer then
+			playercapture()	
+			player.f=0
+			nme.hascapture=true
 		end
-		disableplayer=false			
 	end
-	
 end
 
 function queue_rect(x1,y1,x2,y2,col)

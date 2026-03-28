@@ -1,11 +1,4 @@
 function doplayer()
-	doenemyhit()
-	if player.alive then
-		queue_spr(player.f,player.x,player.y,1,1,false,false)
-	end
-end
-
-function doenemyhit()	
 	if #nmerounds > 0 and player.alive then
 		for r in all(nmerounds) do
 			if doboxcollision(player.x,player.y,r.x-1,r.y-2,8) then				
@@ -13,34 +6,52 @@ function doenemyhit()
 			end	
 		end
 	end
-end
 
-function resetplayer()
-	if #nmesatt==0 then
-		player.alive=true			
-		player.t=1
-		player.x=63
-		player.y=112
-		rounds={}
-		nmerounds={}
-		fire=0
+	if player.alive then
+		queue_spr(player.f,player.x,player.y,1,1,false,false)
 	end
 end
 
+--function resetplayer()
+--	if #nmesatt==0 then
+--		player.alive=true			
+--		player.t=1
+--		player.x=63
+--		player.y=112
+--		rounds={}
+--		nmerounds={}
+--		fire=0
+--	end
+--end
+
 function playerdeath()
-	
-	if not invince and not disableplayer then
+	if not invince then
 		printh("Player Died: #nmesatt="..#nmesatt..", #nmescap="..#nmescap..", player.lives="..player.lives..", nmealive="..tostr(nmealive)..", playfieldnmes="..playfieldnmes,"log.txt")
-		sfx(2,2)  -- player explode sound
+		
 		player.alive=false
 		player.lives-=1
+				
 		playerexplosion={x=player.x,y=player.y,t=1}
-
+		sfx(2,2)  -- player explode sound
+		
 		if player.lives<0 then
 			gameover=true
 		end				
 		player.t=2	
 	end
+end
+
+function playercapture()
+	printh("Player Captures: #nmesatt="..#nmesatt..", #nmescap="..#nmescap..", player.lives="..player.lives..", nmealive="..tostr(nmealive)..", playfieldnmes="..playfieldnmes,"log.txt")
+	
+	player.alive=false
+	player.lives-=1
+	
+	if player.lives<0 then
+		gameover=true
+	end				
+	player.t=2	
+	player.f=16
 end
 
 function doboxcollision(sx,sy,tx,ty,size)
@@ -76,36 +87,34 @@ function dorectoverlapcollision(ax,ay,bx,by,asizex,asizey,bsizex,bsizey)
 end
 
 function drawplayersprite(ang,x,y)
-	local frs=capturedplayersprites
-
 	local index=flr(ang*24)+1
 	local fram={
-		{capturedplayersprites[1],false,false},
-		{capturedplayersprites[2],false,false},
-		{capturedplayersprites[3],false,false},
-		{capturedplayersprites[4],false,false},
-		{capturedplayersprites[5],false,false},
-		{capturedplayersprites[6],false,false},
-		{capturedplayersprites[7],false,false},
+		{23,false,false},
+		{24,false,false},
+		{25,false,false},
+		{26,false,false},
+		{27,false,false},
+		{28,false,false},
+		{29,false,false},
 
-		{capturedplayersprites[6],false,true},
-		{capturedplayersprites[5],false,true},
-		{capturedplayersprites[4],false,true},
-		{capturedplayersprites[3],false,true},
-		{capturedplayersprites[2],false,true},
-		{capturedplayersprites[1],false,true},
-		{capturedplayersprites[2],true,true},
+		{28,false,true},
+		{27,false,true},
+		{26,false,true},
+		{25,false,true},
+		{24,false,true},
+		{23,false,true},
+		{24,true,true},
 
-		{capturedplayersprites[3],true,true},
-		{capturedplayersprites[4],true,true},
-		{capturedplayersprites[5],true,true},
-		{capturedplayersprites[6],true,true},
-		{capturedplayersprites[7],true,false},
-		{capturedplayersprites[6],true,false},
-		{capturedplayersprites[5],true,false},
-		{capturedplayersprites[4],true,false},
-		{capturedplayersprites[3],true,false},
-		{capturedplayersprites[2],true,false}
+		{25,true,true},
+		{26,true,true},
+		{27,true,true},
+		{28,true,true},
+		{29,true,false},
+		{28,true,false},
+		{27,true,false},
+		{26,true,false},
+		{25,true,false},
+		{24,true,false}
 	}
 	queue_spr(fram[index][1],x,y,1,1,fram[index][2],fram[index][3])
 end

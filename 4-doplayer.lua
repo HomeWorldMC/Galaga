@@ -1,7 +1,7 @@
 function doplayer()
 	if #nmerounds > 0 and player.alive then
 		for r in all(nmerounds) do
-			if doboxcollision(player.x,player.y,r.x-1,r.y-2,8) then				
+			if doboxcollision(player.x,player.y,r.x-1,r.y-2,8) and not disableplayer then				
 				playerdeath()	
 			end	
 		end

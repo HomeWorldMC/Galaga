@@ -265,20 +265,22 @@ function _update60()
 				dolog("gamephase-info-switched")
 			end)
 		else
-			if #nmesatt==0 then
-				player.x=63
-				player.y=112
-				player.f=16
-				disableplayer=false
-				dolog("gamephase-info-moving")
-				gamephase=6
-				swapgamephase=lastgamephase
-				dolog("gamephase-info-to")
-				after(1.5, function() 
-					gamephase=swapgamephase
-					dolog("gamephase-info-switched")
-					player.alive=true
-				end)
+			if not tractoron then
+				if #nmesatt==0 then
+					player.x=63
+					player.y=112
+					player.f=16
+					disableplayer=false
+					dolog("gamephase-info-moving")
+					gamephase=6
+					swapgamephase=lastgamephase
+					dolog("gamephase-info-to")
+					after(1.5, function() 
+						gamephase=swapgamephase
+						dolog("gamephase-info-switched")
+						player.alive=true
+					end)
+				end
 			end
 		end
 	end

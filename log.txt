@@ -5,7 +5,7 @@ Moving from - gamephase=1, swapgamephase=6. Is challenging stage: false
 Moving from - gamephase=2, swapgamephase=2. Is challenging stage: false
 	to - gamephase=6, swapgamephase=3
 	switched - gamephase=3. swapgamephase=3
-Player Captures: #nmesatt=0, #nmescap=1, player.lives=2, nmealive=true, playfieldnmes=10
+Player Captures: #nmesatt=0, #nmescap=1, player.lives=2, nmealive=true, playfieldnmes=7
 Moving from - gamephase=3, swapgamephase=3. Is challenging stage: false
 	to - gamephase=6, swapgamephase=5
 	switched - gamephase=5. swapgamephase=5
@@ -23,4 +23,3 @@ Moving from - gamephase=4, swapgamephase=4. Is challenging stage: false
 	switched - gamephase=1. swapgamephase=1
 Moving from - gamephase=1, swapgamephase=1. Is challenging stage: false
 	to - gamephase=7, swapgamephase=2
-	switched - gamephase=2. swapgamephase=2

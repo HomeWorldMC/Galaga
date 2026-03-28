@@ -150,7 +150,7 @@ function nmeattacking()
 			del(nmesatt,nmeatt)
 		end
 		
-		if doboxoverlapcollision(nmeatt.ax,nmeatt.ay,player.x,player.y,8) and player.alive then	
+		if doboxoverlapcollision(nmeatt.ax,nmeatt.ay,player.x,player.y,8) and player.alive and not disableplayer then	
 			playerdeath()
 			destroynme(nmeatt)
 		end		

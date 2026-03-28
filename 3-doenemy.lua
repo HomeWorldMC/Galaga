@@ -15,7 +15,7 @@ function doenemy()
 				playfield[r][c].nme.x=playfield[r][c].x
 
 				-- check to see if nme does attack run
-				if beginruntimer<0 and flr(rnd(nmecount*4)+1)==1 and #nmesatt<3 and playfield[r][c].nme.mode==0 
+				if beginruntimer<0 and flr(rnd(nmecount*4)+1)==1 and #nmesatt<numattackers and playfield[r][c].nme.mode==0 
 					and player.alive and gamephase==3 and not disableplayer then
 
 					beginruntimer=4
@@ -66,54 +66,12 @@ function doenemy()
 								add(explosions,{x=playfield[r][c].nme.x,y=playfield[r][c].nme.y-9,t=1})
 								sfx(1,1)
 								playfield[r][c].nme.hascapture=false
-							-- else
-							-- 	if doboxcollision(playfield[r][c].nme.x,playfield[r][c].nme.y,rds.x,rds.y,nmehitboxwidth) 
-							-- 		and not disableplayer and not playfield[r][c].nme.isimmortal then	
-
-							-- 		del(rounds,rds)
-							-- 		if playfield[r][c].nme.hp>1 then
-							-- 			playfield[r][c].nme.hp-=1
-							-- 		else
-							-- 			sfx(1,1) -- nme explode sound
-							-- 			if playfield[r][c].nme.mode==0 then
-							-- 				player.score+=nmescores[playfield[r][c].nme.typ]
-							-- 			else
-							-- 				player.score+=(nmescores[playfield[r][c].nme.typ]*4)
-							-- 			end
-							-- 			add(explosions,{x=playfield[r][c].nme.x,y=playfield[r][c].nme.y,t=1})
-							-- 			playfield[r][c].nme.mode=2
-							-- 			playfield[r][c].canwrite=true	
-							-- 			playfieldnmes-=1
-							-- 			freelifecheck()
-							-- 			stagekills+=1
-							-- 		end
-							-- 	end
+							else
+								checkrounds(playfield[r][c].nme,rds,1,r,c,1)
 							end
 						else
-							if doboxcollision(playfield[r][c].nme.x,playfield[r][c].nme.y,rds.x,rds.y,nmehitboxwidth) 
-								and not disableplayer and not playfield[r][c].nme.isimmortal then	
-
-								del(rounds,rds)
-								if playfield[r][c].nme.hp>1 then
-									playfield[r][c].nme.hp-=1
-								else
-									sfx(1,1) -- nme explode sound
-									if playfield[r][c].nme.mode==0 then
-										player.score+=nmescores[playfield[r][c].nme.typ]
-									else
-										player.score+=(nmescores[playfield[r][c].nme.typ]*4)
-									end
-									add(explosions,{x=playfield[r][c].nme.x,y=playfield[r][c].nme.y,t=1})
-									playfield[r][c].nme.mode=2
-									playfield[r][c].canwrite=true	
-									playfieldnmes-=1
-									freelifecheck()
-									stagekills+=1
-								end
-							end		
+							checkrounds(playfield[r][c].nme,rds,1,r,c,1)
 						end
-
-						
 					end
 				end
 				drawsprite(playfield[r][c].nme,false)
@@ -181,7 +139,11 @@ function nmeattacking()
 		
 		if doboxoverlapcollision(nmeatt.x,nmeatt.y,player.x,player.y,8) and player.alive and not disableplayer and not nmeatt.isimmortal then	
 			playerdeath()
-			destroynme(nmeatt)
+			sfx(1,1) -- nme explode sound
+			player.score+=(nmescores[nmeatt.typ]*4)
+			add(explosions,{x=nmeatt.x,y=nmeatt.y,t=1})
+			del(nmesatt,nmeatt)
+			freelifecheck()	
 		end		
 		
 		if #rounds > 0 then
@@ -192,33 +154,11 @@ function nmeattacking()
 						add(explosions,{x=nmeatt.x,y=nmeatt.y-9,t=1})
 						sfx(1,1)
 						nmeatt.hascapture=false
-					-- else
-					-- 	if doboxcollision(nmeatt.x,nmeatt.y,r.x,r.y,nmehitboxwidth) and not disableplayer and not nmeatt.isimmortal then
-					-- 		--local pfslot=playfield[nmeatt.row][nmeatt.col].nmeatt
-
-					-- 		if nmeatt.hp>1 then
-					-- 			nmeatt.hp-=1
-					-- 		else
-					-- 			destroynme(nmeatt)
-					-- 			stagekills+=1
-					-- 		end
-						
-					-- 		del(rounds,r)
-					-- 	end
+					else
+						checkrounds(nmeatt,r,4,0,0,2)
 					end
 				else
-					if doboxcollision(nmeatt.x,nmeatt.y,r.x,r.y,nmehitboxwidth) and not disableplayer and not nmeatt.isimmortal then
-						--local pfslot=playfield[nmeatt.row][nmeatt.col].nmeatt
-
-						if nmeatt.hp>1 then
-							nmeatt.hp-=1
-						else
-							destroynme(nmeatt)
-							stagekills+=1
-						end
-					
-						del(rounds,r)
-					end
+					checkrounds(nmeatt,r,4,0,0,2)
 				end
 			end
 		end
@@ -228,15 +168,6 @@ function nmeattacking()
 			queue_spr(23, nmeatt.x+1, nmeatt.y-9, 1, 1, false, false)
 		end
 	end	
-end
-
-function destroynme(nme)
-	sfx(1,1) -- nme explode sound
-	player.score+=(nmescores[nme.typ]*4)
-
-	add(explosions,{x=nme.x,y=nme.y,t=1})
-	del(nmesatt,nme)
-	freelifecheck()	
 end
 
 function findemptyslot(t)
@@ -282,16 +213,6 @@ function findemptyslot(t)
 		end
 	end
 
-	--for r=1,#playfield do
-	--	for c=1,#playfield[r] do
-	--		local slot=playfield[r][c]
-	--		if slot.canwrite and slot.holdslot==false and slot.nme.typ==t then
-	--			slot.holdslot=true
-	--			return slot
-	--		end
-	--	end	
-	--end
-	--printh("should never get here","log.txt")
 	return nil
 end
 
@@ -456,49 +377,11 @@ function dowave()
 						add(explosions,{x=nme.x,y=nme.y-9,t=1})
 						sfx(1,1)
 						nme.hascapture=false
-					-- else
-					-- 	if doboxcollision(nme.x,nme.y,r.x,r.y,nmehitboxwidth) and not disableplayer and not nme.isimmortal  then
-					-- 		--printh("nme.mode:" .. nme.mode, logfile)
-					-- 		del(rounds,r)
-					-- 		if nme.hp>1 then
-					-- 			nme.hp-=1
-					-- 		else
-					-- 			sfx(1,1) -- nme explode sound
-					-- 			player.score+=(nmescores[nme.typ]*4)
-
-					-- 			add(explosions,{x=nme.x,y=nme.y,t=1})
-					-- 			freelifecheck()		
-					-- 			del(twave,nme)
-					-- 			nmewavenmes-=1
-					-- 			nme.mode=2
-					-- 			stagekills+=1
-					-- 			if nme.row>0 and nme.col>0 then
-					-- 				playfield[nme.row][nme.col].holdslot=false	
-					-- 			end
-					-- 		end
-					-- 	end
+					else
+						checkrounds(nme,r,1,0,0,3)
 					end
 				else
-					if doboxcollision(nme.x,nme.y,r.x,r.y,nmehitboxwidth) and not disableplayer and not nme.isimmortal  then
-						--printh("nme.mode:" .. nme.mode, logfile)
-						del(rounds,r)
-						if nme.hp>1 then
-							nme.hp-=1
-						else
-							sfx(1,1) -- nme explode sound
-							player.score+=(nmescores[nme.typ]*4)
-
-							add(explosions,{x=nme.x,y=nme.y,t=1})
-							freelifecheck()		
-							del(twave,nme)
-							nmewavenmes-=1
-							nme.mode=2
-							stagekills+=1
-							if nme.row>0 and nme.col>0 then
-								playfield[nme.row][nme.col].holdslot=false	
-							end
-						end
-					end
+					checkrounds(nme,r,1,0,0,3)
 				end
 			end
 		end
@@ -684,24 +567,36 @@ function doenemyfireroll(nme,st,min,max)
 	end
 end
 
-function checkrounds(nme,nmetable,r, bonus)
-	if doboxcollision(nme.x,nme.y,r.x,r.y,nmehitboxwidth) and not disableplayer and not nme.isimmortal then	
+function checkrounds(nme,round,bonus,row,col,typ)
+	if doboxcollision(nme.x,nme.y,round.x,round.y,nmehitboxwidth) and not disableplayer and not nme.isimmortal then	
+		del(rounds,round)
 		if nme.hp>1 then
 			nme.hp-=1
 		else
 			sfx(1,1) -- nme explode sound
 			player.score+=(nmescores[nme.typ]*bonus)
 			add(explosions,{x=nme.x,y=nme.y,t=1})
-			del(nmetable,nme)
 			freelifecheck()
 			stagekills+=1
-			nme.mode=2
-			playfieldnmes-=1
 
-			nmewavenmes-=1
-			if nme.row>0 and nme.col>0 then
-				playfield[nme.row][nme.col].holdslot=false	
-				playfield[nme.row][nme.col].canwrite=true	
+			-- type 1
+			if typ==1 then
+				nme.mode=2
+				playfield[row][col].canwrite=true	
+				playfieldnmes-=1
+			end
+
+			if typ==2 then
+				del(nmesatt,nme)
+			end
+
+			if typ==3 then
+				nmewavenmes-=1
+				nme.mode=2
+				if nme.row>0 and nme.col>0 then
+					playfield[nme.row][nme.col].holdslot=false
+				end
+				del(twave,nme)
 			end
 		end
 	end	

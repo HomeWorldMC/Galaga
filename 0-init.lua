@@ -77,8 +77,7 @@ function _init()
 
 	endofstage=false
 
-	--testsprite={x=10,y=10,s=10}
-	--move({x=100,y=100}, testsprite)
+	numattackers=2
 
 	initialisestars()
 end
@@ -319,7 +318,7 @@ function _draw()
 	cls(0)
 	dostarfield()
 
-	--print("gamephase:"..gamephase,5,30,7) 
+
 	
 	--flush_rectfillq()
 	flush_drawq()
@@ -336,6 +335,9 @@ function _draw()
 	
 
 	flush_printq()
+	-- if nmesatt~= nil then
+	-- 	print("#nmesatt:"..#nmesatt,5,30,7) 
+	-- end
 end
 
 function doCSScreen()

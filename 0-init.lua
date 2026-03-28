@@ -265,10 +265,10 @@ function _update60()
 				dolog("gamephase-info-switched")
 			end)
 		else
-			if not tractoron then
+			if #nmescap==0 then
 				if #nmesatt==0 then
 					player.x=63
-					player.y=112
+					player.y=116
 					player.f=16
 					disableplayer=false
 					dolog("gamephase-info-moving")
@@ -614,8 +614,7 @@ function dotractorbeam(offx,offy,nme)
 		tractorendtimer=10
 		-- do next fighter routines	
 		if disableplayer then
-			playercapture()	
-			player.f=0
+			playercapture()			
 			nme.hascapture=true
 		end
 	end

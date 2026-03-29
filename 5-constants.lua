@@ -132,8 +132,4 @@ function initialiseconstants()
 	--[[capture path]]				
 	{{x=69,y=19},{x=68,y=27},{x=61,y=34},{x=58,y=40},{x=58,y=51},{x=69,y=76},{x=75,y=81},{x=82,y=82},{x=86,y=77},{x=86,y=66},{x=80,y=47},{x=71,y=25}}
 	}
-
-    tcols1={1,3,12}
-	tcols2={12,1,3}
-	tcols3={3,12,1}
 end

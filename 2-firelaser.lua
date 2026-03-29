@@ -1,6 +1,12 @@
 function firelaser()
+	if player.secondplayer~=nil then
+		add(rounds,{x=player.x+12,y=player.y})
+	end
+
 	add(rounds,{x=player.x+4,y=player.y})
+	
 	fire=0
+	
 	sfx(0,2) --player laser sound
 end
 
@@ -23,6 +29,8 @@ function animateenemyrounds(rnds,sp,dir)
 	for i in all(rnds) do
 		i.x += i.vx
 		i.y += i.vy
+
+
 		queue_spr(sp,i.x-1,i.y-5,1,1,false,false)
 		if i.x < 0 or i.x > 128 or i.y>132 or i.y<0 then
 			del(rnds,i)

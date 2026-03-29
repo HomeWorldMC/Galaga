@@ -8,7 +8,14 @@ function doplayer()
 	end
 
 	if player.alive then
-		queue_spr(player.f,player.x,player.y,1,1,false,false)
+		if player.secondplayer~=nil then
+			if disableplayer then
+				queue_spr(player.secondplayer.f,player.secondplayer.x,player.secondplayer.y,1,1,player.secondplayer.flipx,player.secondplayer.flipy)
+			else
+				queue_spr(player.secondplayer.f,player.x+7,player.y,1,1,player.secondplayer.flipx,player.secondplayer.flipy)
+			end
+		end
+		queue_spr(player.f,player.x,player.y,1,1,player.flipx,player.flipy)
 	end
 end
 
@@ -72,7 +79,7 @@ function dorectoverlapcollision(ax,ay,bx,by,asizex,asizey,bsizex,bsizey)
 	)
 end
 
-function drawplayersprite(ang,x,y,set)
+function drawplayersprite(ang,set)
 	local playersprites={{16,17,18,19,20,21,22},{23,24,25,26,27,28,29}}
 	
 	local index=flr(ang*24)+1
@@ -104,5 +111,6 @@ function drawplayersprite(ang,x,y,set)
 		{playersprites[set][3],true,false},
 		{playersprites[set][2],true,false}
 	}
-	queue_spr(fram[index][1],x,y,1,1,fram[index][2],fram[index][3])
+	--queue_spr(fram[index][1],x,y,1,1,fram[index][2],fram[index][3])
+	return fram[index]
 end

@@ -24,7 +24,7 @@ function doenemy()
 					playfield[r][c].nme.ay=playfield[r][c].nme.y
 					playfield[r][c].nme.ph=rnd(1)
 
-					if playfield[r][c].nme.typ==3 and #nmescap==0 and flr(rnd(2))==0 and not triedcapturethisstage then
+					if playfield[r][c].nme.typ==3 and #nmescap==0 and flr(rnd(2))==0 and not triedcapturethisstage and player.secondplayer==nil then
 						add(nmescap,playfield[r][c].nme)
 						triedcapturethisstage=true					
 					else
@@ -155,7 +155,11 @@ function nmeattacking()
 						sfx(1,1)
 						nmeatt.hascapture=false
 					else
-						checkrounds(nmeatt,r,4,0,0,2)
+						if checkrounds(nmeatt,r,4,0,0,2) and nmeatt.hp==0 then
+							-- do fighter reclaim stuff here
+							dorecapture(nmeatt)
+						end
+						
 					end
 				else
 					checkrounds(nmeatt,r,4,0,0,2)
@@ -573,6 +577,7 @@ function checkrounds(nme,round,bonus,row,col,typ)
 		if nme.hp>1 then
 			nme.hp-=1
 		else
+			nme.hp-=1
 			sfx(1,1) -- nme explode sound
 			player.score+=(nmescores[nme.typ]*bonus)
 			add(explosions,{x=nme.x,y=nme.y,t=1})
@@ -599,5 +604,7 @@ function checkrounds(nme,round,bonus,row,col,typ)
 				del(twave,nme)
 			end
 		end
+		return true
 	end	
+	return false
 end

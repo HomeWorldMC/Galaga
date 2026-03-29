@@ -7,7 +7,7 @@ function _init()
 
 	initialiseconstants()
 	
-	invince=true
+	invince=false
 	if invince then
 		maxrounds=5
 		musicstart=3
@@ -29,7 +29,7 @@ function _init()
 	freelivesgiven=1
 	gamephase=0
 	gameover=true
-	player={x=63,y=116,lives=2,alive=true,t=0,f=16,animlock=1,score=0}
+	player={x=61,y=116,lives=2,alive=true,t=0,f=16,animlock=1,score=0,secondplayer=nil,flipx=false,flipy=false}
 	nmewavespd=1.75
 	wavetimer=3
 	wavecounter=1
@@ -79,13 +79,16 @@ function _init()
 
 	numattackers=2
 
+	cycleflag=false
+
 	initialisestars()
 end
 
 function _update60()
 	update_timers(1/30)
-	update_cycletimers(1/30)
-	update_movetimers(1/30)
+	update_cycletimers()
+	update_movetimers(1)
+	update_movetimers(2)
 
 	musicstate=stat(24)
 
@@ -126,13 +129,10 @@ function _update60()
 				initialisestage()
 				getshieldnumbers()
 
-				dolog("gamephase-info-moving")
 				gamephase=7
 				swapgamephase=2
-				dolog("gamephase-info-to")
 				after(2, function() 
 					gamephase=swapgamephase	
-					dolog("gamephase-info-switched")
 				end)
 				stagesfx=true
 			end
@@ -144,13 +144,10 @@ function _update60()
 			if wavecounter==#nmewavequeue then	-- all waves completed. move to formation attack phase (game phase 3)
 				if not ischallengingstage then
 					if musicstate < 0 then
-						dolog("gamephase-info-moving")
 						gamephase=6
 						swapgamephase=3
-						dolog("gamephase-info-to")
 						after(0, function()
 							gamephase=swapgamephase
-							dolog("gamephase-info-switched")
 						end)
 					else
 						doCSScreen()
@@ -163,7 +160,6 @@ function _update60()
 						end
 					end
 				else
-					--do end of challenging stage stuff here
 					if musicstate < 0 then
 						printh("--end of challenging stage-- ischallengingstage="..tostr(ischallengingstage),"log.txt")
 						music(5)
@@ -175,13 +171,10 @@ function _update60()
 			end
 		else
 			if not player.alive then -- player died during wave attack. move to game phase 5 (player respawn)
-				dolog("gamephase-info-moving")
 				gamephase=6
 				swapgamephase=5
-				dolog("gamephase-info-to")
 				after(1.5, function()
 					gamephase=swapgamephase
-					dolog("gamephase-info-switched")
 				end)
 				lastgamephase=2
 			end
@@ -197,7 +190,7 @@ function _update60()
 			music(-1)
 		end
 
-		if #nmesatt==0 and #nmescap==0  then
+		if #nmesatt==0 and #nmescap==0 then
 			if not nmealive and playfieldnmes<=0 then
 				if player.alive then -- all waves and formations cleared. move to next stage
 					getshieldnumbers()
@@ -206,62 +199,51 @@ function _update60()
 					fire=0
 					stagekills=0
 					playfieldnmes=0
-					dolog("gamephase-info-moving")
 					gamephase=6
 					swapgamephase=4
-					dolog("gamephase-info-to")
 					after(1.5, function()
 						gamephase=swapgamephase
-						dolog("gamephase-info-switched")
 					end)
 				else
-					dolog("gamephase-info-moving")
 					gamephase=6
 					swapgamephase=5
-					dolog("gamephase-info-to")
 					after(1.5, function()
 						gamephase=swapgamephase
-						dolog("gamephase-info-switched")
 					end)
 				end
 			else
 				if not player.alive then -- player died during formation attack. move to game phase 5 (player respawn)
-					dolog("gamephase-info-moving")
 					gamephase=6
 					swapgamephase=5
-					dolog("gamephase-info-to")
 					after(1.5, function()
 						gamephase=swapgamephase
-						dolog("gamephase-info-switched")
 					end)
 				end
 			end
 		end
 	elseif gamephase==4 then --enemies cleared
-		maingame()	
-		wavesetval+=1
-		if wavesetval>3 then
-			wavesetval=1
+		if not disableplayer then
+			maingame()
+			wavesetval+=1
+			if wavesetval>3 then
+				wavesetval=1
+			end
+			gamephase=6
+			swapgamephase=1
+			after(1.5, function() 
+				gamephase=swapgamephase
+			end)
+			stage+=1
+		else
+			maingame()
 		end
-		dolog("gamephase-info-moving")
-		gamephase=6
-		swapgamephase=1
-		dolog("gamephase-info-to")
-		after(1.5, function() 
-			gamephase=swapgamephase
-			dolog("gamephase-info-switched")
-		end)
-		stage+=1
 	elseif gamephase==5 then -- player dead
 		maingame()
 		if player.lives<0 then
-			dolog("gamephase-info-moving")
 			gamephase=6
 			swapgamephase=8
-			dolog("gamephase-info-to")
 			after(0, function()
 				gamephase=swapgamephase
-				dolog("gamephase-info-switched")
 			end)
 		else
 			if #nmescap==0 then
@@ -270,13 +252,11 @@ function _update60()
 					player.y=116
 					player.f=16
 					disableplayer=false
-					dolog("gamephase-info-moving")
+					player.secondplayer=nil
 					gamephase=6
 					swapgamephase=lastgamephase
-					dolog("gamephase-info-to")
 					after(1.5, function() 
 						gamephase=swapgamephase
-						dolog("gamephase-info-switched")
 						player.alive=true
 					end)
 				end
@@ -335,9 +315,11 @@ function _draw()
 	
 
 	flush_printq()
-	-- if nmesatt~= nil then
-	-- 	print("#nmesatt:"..#nmesatt,5,30,7) 
-	-- end
+	--if #movetimers>0 then
+	-- 	print("moving stuff",5,90,7) 
+	--else
+	--	print("finished moving stuff",5,90,7) 
+	--end
 end
 
 function doCSScreen()
@@ -378,9 +360,16 @@ function controls()
 	end
 	
 	if btn(➡️) then
-		if player.x<115 then
-			player.x+=shipspeedx
+		if player.secondplayer~=nil then
+			if player.x<109 then
+				player.x+=shipspeedx
+			end
+		else
+			if player.x<117 then
+				player.x+=shipspeedx
+			end
 		end
+		
 	end
 	
 	if btnp(❎) then
@@ -404,11 +393,8 @@ function freelifecheck()
 end
 
 function startgame()
-	--sfx(4,0) -- start game sound
 	music(musicstart)
-	
-	player={x=63,y=116,lives=2,alive=true,t=0,f=16,animlock=1,score=0,captured=false, capturedby=nil}
-	--playerlifetimer=7
+	player={x=61,y=116,lives=2,alive=true,t=0,f=16,animlock=1,score=0,captured=false,capturedby=nil,hassecond=false,flipx=false,flipy=false}
 	gameover=false
 	firsttime=false
 	stage=1
@@ -445,10 +431,9 @@ function initialisestage()
 	for r=1,5 do
 		add(playfield,{})
 		for c=1,10 do
-			local nme={x=nmex,y=nmey,ax=nmex,ay=nmey,lax=nmex,lay=nmey,f=1,st=0,dir=0,typ=typ[r],t=1,ph=0,sw=flr(rnd(2)) * 2 - 1,col=c,row=r,mode=0,timer=3,dr=0.5,hp=hp[r]}
-			add(playfield[r],{x=nme.x, y=nme.y, nme=nme,row=r,col=c,canwrite=true,holdslot=false})
+			add(playfield[r],{x=nmex,y=nmey,nme={},row=r,col=c,canwrite=true,holdslot=false})
 			nmex+=12
-		end	
+		end
 		nmey+=10
 		nmex=12
 	end	
@@ -467,7 +452,7 @@ end
 function buildstagenmewaves(wav)
 	local wavset={}
 	local hp=1
-	local nme
+	--local nme
 
 	ntindex=1
 	ptindex=1
@@ -477,9 +462,8 @@ function buildstagenmewaves(wav)
 		if wav[2][ntindex]==3 then hp=2 else hp=1 end
 		
 		for nw=1, wav[1] do
-			nme={x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wav[2][ntindex],t=1,ph=0,sw=flr(rnd(2))*2-1,col=0,
-				row=0,mode=3,timer=3,dr=0.5,hp=hp,path=wav[3][ptindex],hascapture=false,index=1,isimmortal=false}
-			add(wavset,nme)
+			--nme={x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wav[2][ntindex],t=1,ph=0,sw=flr(rnd(2))*2-1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=hp,path=wav[3][ptindex],hascapture=false,index=1,isimmortal=false}
+			add(wavset,{x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wav[2][ntindex],t=1,ph=0,sw=flr(rnd(2))*2-1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=hp,path=wav[3][ptindex],hascapture=false,index=1,isimmortal=false})
 			
 			ntindex+=1
 			ptindex+=1
@@ -507,15 +491,12 @@ end
 
 function initialisestars()
 	cols={5,13,1}
-	stars={}
-	
+	stars={}	
 	local speed=1
-	for j=1,3 do
-		
+	for j=1,3 do		
 		for i=1,30 do
 			add(starsx,rnd(126)+1)
-			add(starsy,rnd(126)+1)
-			
+			add(starsy,rnd(126)+1)			
 			add(stars,{x=rnd(126),y=rnd(126),col=cols[j],spd=speed})			
 		end
 		speed-=0.25
@@ -524,7 +505,6 @@ end
 
 function doexplosions()
 	for n=#explosions,1,-1 do
-		--spr(explosionsframes[flr(explosions[n].t)],explosions[n].x,explosions[n].y)
 		queue_spr(explosionsframes[flr(explosions[n].t)],explosions[n].x,explosions[n].y,1,1,false,false)
 		explosions[n].t+=explosionspd
 		if explosions[n].t>(6-explosionspd) then
@@ -544,15 +524,11 @@ function doplayerexplosion()
 end
 
 function fetchpath(p)
-	local path_index=tonum(sub(p, 1, 1))
-	local path_type=sub(p, 2,2)
-	local path=paths[path_index]
-
-	if path_type=="b" then
-		path=flippath(path)
+	if sub(p,2,2)=="b" then
+		return flippath(paths[tonum(sub(p,1,1))])
+	else
+		return paths[tonum(sub(p,1,1))]
 	end
-	
-	return path
 end
 
 function flippath(path)
@@ -573,17 +549,17 @@ end
 function dotractorbeam(offx,offy,nme)
 	tractorfx=8
 	queue_sspr(0, 32, 24, trmov, offx, offy, 24, trmov)
+	
+	tcols={1,3,12}
 
-	local c1=tcols1[flr(tcol)]
-	local c2=tcols2[flr(tcol)]
-	local c3=tcols3[flr(tcol)]
-
-	tcol+=0.3
+	tcol+=0.2
 	if tcol>3.8 then tcol=1 end
 
-	pal(2,c1,1)
-	pal(11,c2,1)
-	pal(15,c3,1)
+	local ind = flr(tcol)
+
+	pal(2, tcols[ ind   %3+1],1)
+	pal(11,tcols[(ind+1)%3+1],1)
+	pal(15,tcols[(ind+2)%3+1],1)	
 
 	trmov+=0.35*trdir
 	if trmov>40  then 		
@@ -607,10 +583,13 @@ function dotractorbeam(offx,offy,nme)
 				else
 					s=2
 				end
-				player.f=drawplayersprite(ang,player.x,player.y, s)
+				local sp=drawplayersprite(ang,s)
+				player.f=sp[1]
+				player.flipx=sp[2]
+				player.flipy=sp[3]
 			end)
-			move({x=player.x,y=player.y},{x=nme.x+1,y=player.y-8})
-			move({x=nme.x+1,y=player.y-8},{x=nme.x+1,y=nme.y+7})
+			move(1,{x=player.x,y=player.y},{x=nme.x+1,y=player.y-8},player)
+			move(1,{x=nme.x+1,y=player.y-8},{x=nme.x+1,y=nme.y+7},player)
 		end
 	end
 	
@@ -625,6 +604,27 @@ function dotractorbeam(offx,offy,nme)
 			nme.hascapture=true
 		end
 	end
+end
+
+function dorecapture(nme)
+	disableplayer=true
+	player.secondplayer={x=nme.x+1,y=nme.y-9,f=16}
+	cycleflag=true
+
+	cycle(2, 0.0266, 
+		function(ang, r)
+			local sp=drawplayersprite(ang,1)
+			player.secondplayer.f=sp[1]
+			player.secondplayer.flipx=sp[2]
+			player.secondplayer.flipy=sp[3]
+		end
+	)
+
+	move(1,{x=player.secondplayer.x,y=player.secondplayer.y},{x=65,y=player.secondplayer.y},player.secondplayer)
+	move(1,{x=65,y=player.secondplayer.y},{x=65,y=116},player.secondplayer,function() 
+		disableplayer=false 	
+	end  )
+	move(2,{x=player.x,y=player.y},{x=58,y=116},player)
 end
 
 function queue_rect(x1,y1,x2,y2,col)
@@ -683,17 +683,13 @@ function flush_rectq()
 end
 
 function startscreen()
-	local x=32
-	local y=20
-	local xoff=0
-	local yoff=0
 	local ymov=0
 
 	if gamephase==8 then
 		ymov=46
 	end
 
-	queue_sspr(24, 32, 64, 24, x, y+ymov, 64,24)
+	queue_sspr(24, 32, 64, 24, 32, 20+ymov, 64,24)
 
 	print("rEMADE",49,39+ymov,13)
 	print("bY",58,45+ymov,13)
@@ -710,10 +706,8 @@ end
 
 function stageUI()
 	if ischallengingstage then
-		--print("challenging stage",30,64,textcol) -- 68  (128-68)/2 = 60/2 = 30
 		queue_prt("challenging stage",30,64,textcol)
 	else
-		--print("stage " .. stage,50,64,textcol)
 		queue_prt("stage " .. stage,50,64,textcol)
 	end	
 end
@@ -761,18 +755,18 @@ function prepwaves()
 	end
 end
 
-function dolog(num)
-	if num=="gamephase-info-moving" then
-		printh("Moving from - gamephase="..gamephase..", swapgamephase="..swapgamephase..". Is challenging stage: "..tostr(ischallengingstage),"log.txt")	
-	elseif num=="gamephase-info-to" then
-		printh("	to - gamephase="..gamephase..", swapgamephase="..swapgamephase,"log.txt")
-	elseif num=="gamephase-info-switched" then
-		printh("	switched - gamephase="..gamephase..". swapgamephase="..swapgamephase,"log.txt")
-	elseif num=="gamephase-info-moving2" then
-		printh("Moving from - gamephase="..gamephase.." to 1, is challenging stage: "..tostr(ischallengingstage),"log.txt")
-	elseif num=="show-stage-title" then
-		printh("--show Stage title--","log.txt")
-	else
-		printh("{no log entry for that}","log.txt")
-	end
-end
+--function dolog(num)
+--	if num=="gamephase-info-moving" then
+--		printh("Moving from - gamephase="..gamephase..", swapgamephase="..swapgamephase..". Is challenging stage: "..tostr(ischallengingstage),"log.txt")	
+--	elseif num=="gamephase-info-to" then
+--		printh("	to - gamephase="..gamephase..", swapgamephase="..swapgamephase,"log.txt")
+--	elseif num=="gamephase-info-switched" then
+--		printh("	switched - gamephase="..gamephase..". swapgamephase="..swapgamephase,"log.txt")
+--	elseif num=="gamephase-info-moving2" then
+--		printh("Moving from - gamephase="..gamephase.." to 1, is challenging stage: "..tostr(ischallengingstage),"log.txt")
+--	elseif num=="show-stage-title" then
+--		printh("--show Stage title--","log.txt")
+--	else
+--		printh("{no log entry for that}","log.txt")
+--	end
+--end

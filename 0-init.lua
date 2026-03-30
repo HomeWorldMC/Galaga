@@ -29,7 +29,21 @@ function _init()
 	freelivesgiven=1
 	gamephase=0
 	gameover=true
-	player={x=61,y=116,lives=2,alive=true,t=0,f=16,animlock=1,score=0,secondplayer=nil,flipx=false,flipy=false}
+
+	player={
+		x=64,
+		y=116,
+		lives=2,
+		alive=true,
+		t=0,
+		f=16,
+		score=0,
+		p=1,
+		flipx=false,
+		flipy=false
+	}
+
+
 	nmewavespd=1.75
 	wavetimer=3
 	wavecounter=1
@@ -81,6 +95,8 @@ function _init()
 
 	cycleflag=false
 
+	capturesprt=nil
+
 	initialisestars()
 end
 
@@ -89,6 +105,12 @@ function _update60()
 	update_cycletimers()
 	update_movetimers(1)
 	update_movetimers(2)
+
+	if player.p==1 then
+		maxrounds=2
+	else
+		maxrounds=4
+	end
 
 	musicstate=stat(24)
 
@@ -161,7 +183,7 @@ function _update60()
 					end
 				else
 					if musicstate < 0 then
-						printh("--end of challenging stage-- ischallengingstage="..tostr(ischallengingstage),"log.txt")
+						--printh("--end of challenging stage-- ischallengingstage="..tostr(ischallengingstage),"log.txt")
 						music(5)
 						ischallengingstage=false
 						challengingmusicswitch=false
@@ -252,7 +274,7 @@ function _update60()
 					player.y=116
 					player.f=16
 					disableplayer=false
-					player.secondplayer=nil
+					player.p=1
 					gamephase=6
 					swapgamephase=lastgamephase
 					after(1.5, function() 
@@ -320,6 +342,9 @@ function _draw()
 	--else
 	--	print("finished moving stuff",5,90,7) 
 	--end
+	if capturesprt~=nil then 
+		spr(capturesprt.f,capturesprt.x,capturesprt.y,1,1,capturesprt.flipx,capturesprt.flipy)
+	end
 end
 
 function doCSScreen()
@@ -360,7 +385,7 @@ function controls()
 	end
 	
 	if btn(➡️) then
-		if player.secondplayer~=nil then
+		if player.p>1 then
 			if player.x<109 then
 				player.x+=shipspeedx
 			end
@@ -394,7 +419,19 @@ end
 
 function startgame()
 	music(musicstart)
-	player={x=61,y=116,lives=2,alive=true,t=0,f=16,animlock=1,score=0,captured=false,capturedby=nil,hassecond=false,flipx=false,flipy=false}
+	--player={x=61,y=116,lives=2,alive=true,t=0,f=16,score=0,captured=false,capturedby=nil,hassecond=false,flipx=false,flipy=false}
+	player={
+		x=64,
+		y=116,
+		lives=2,
+		alive=true,
+		t=0,
+		f=16,
+		score=0,
+		p=1,
+		flipx=false,
+		flipy=false
+	}
 	gameover=false
 	firsttime=false
 	stage=1
@@ -608,23 +645,29 @@ end
 
 function dorecapture(nme)
 	disableplayer=true
-	player.secondplayer={x=nme.x+1,y=nme.y-9,f=16}
+	capturesprt={x=nme.x+1,y=nme.y-9,f=16,flipx=false,flipy=false}
 	cycleflag=true
 
 	cycle(2, 0.0266, 
 		function(ang, r)
 			local sp=drawplayersprite(ang,1)
-			player.secondplayer.f=sp[1]
-			player.secondplayer.flipx=sp[2]
-			player.secondplayer.flipy=sp[3]
+			capturesprt.f=sp[1]
+			capturesprt.flipx=sp[2]
+			capturesprt.flipy=sp[3]
 		end
 	)
 
-	move(1,{x=player.secondplayer.x,y=player.secondplayer.y},{x=65,y=player.secondplayer.y},player.secondplayer)
-	move(1,{x=65,y=player.secondplayer.y},{x=65,y=116},player.secondplayer,function() 
-		disableplayer=false 	
-	end  )
-	move(2,{x=player.x,y=player.y},{x=58,y=116},player)
+	move(1,{x=capturesprt.x,y=capturesprt.y},{x=67,y=capturesprt.y},capturesprt)
+	move(1,{x=67,y=capturesprt.y},{x=67,y=116},capturesprt,
+		function() 
+			disableplayer=false 
+			capturesprt=nil	
+			player.p=2
+			player.x=64
+			player.y=116
+		end  
+	)
+	move(2,{x=player.x,y=player.y},{x=60,y=116},player)
 end
 
 function queue_rect(x1,y1,x2,y2,col)

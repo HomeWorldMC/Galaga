@@ -1,12 +1,12 @@
 function firelaser()
-	if player.secondplayer~=nil then
-		add(rounds,{x=player.x+12,y=player.y})
+	if player.p>1 then
+		add(rounds,{x=player.x+7,y=player.y})
+		add(rounds,{x=player.x,y=player.y})
+	else
+		add(rounds,{x=player.x+4,y=player.y})
 	end
 
-	add(rounds,{x=player.x+4,y=player.y})
-	
-	fire=0
-	
+	fire=0	
 	sfx(0,2) --player laser sound
 end
 

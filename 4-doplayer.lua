@@ -1,31 +1,48 @@
 function doplayer()
+	
 	if #nmerounds > 0 and player.alive then
 		for r in all(nmerounds) do
-			if doboxcollision(player.x,player.y,r.x-1,r.y-2,8) and not disableplayer then				
-				playerdeath()	
-			end	
+			if player.p>1 and not invince then
+				if not disableplayer then
+					if doboxcollision(player.x+3,player.y,r.x-1,r.y-2,8) then
+						playerexplosion={x=player.x+3,y=player.y,t=1}
+						sfx(2,2)  -- player explode sound
+						player.p=1
+						del(nmerounds,r)
+					elseif doboxcollision(player.x-4,player.y,r.x-1,r.y-2,8) then
+						playerexplosion={x=player.x-4,y=player.y,t=1}
+						sfx(2,2)  -- player explode sound
+						player.p=1
+						del(nmerounds,r)
+					end
+				end
+			else
+				if doboxcollision(player.x,player.y,r.x-1,r.y-2,8) and not disableplayer then				
+					playerdeath()	
+				end	
+			end
 		end
 	end
 
 	if player.alive then
-		if player.secondplayer~=nil then
-			if disableplayer then
-				queue_spr(player.secondplayer.f,player.secondplayer.x,player.secondplayer.y,1,1,player.secondplayer.flipx,player.secondplayer.flipy)
-			else
-				queue_spr(player.secondplayer.f,player.x+7,player.y,1,1,player.secondplayer.flipx,player.secondplayer.flipy)
-			end
+		if player.p>1 then
+			queue_spr(player.f,player.x+3,player.y,1,1,player.flipx,player.flipy)
+			queue_spr(player.f,player.x-4,player.y,1,1,player.flipx,player.flipy)
+		else
+			queue_spr(player.f,player.x,player.y,1,1,player.flipx,player.flipy)
 		end
-		queue_spr(player.f,player.x,player.y,1,1,player.flipx,player.flipy)
+		
 	end
 end
 
 function playerdeath()
 	if not invince then
-		printh("Player Died: #nmesatt="..#nmesatt..", #nmescap="..#nmescap..", player.lives="..player.lives..", nmealive="..tostr(nmealive)..", playfieldnmes="..playfieldnmes,"log.txt")
+		--printh("Player Died: #nmesatt="..#nmesatt..", #nmescap="..#nmescap..", player.lives="..player.lives..", nmealive="..tostr(nmealive)..", playfieldnmes="..playfieldnmes,"log.txt")
 		
 		player.alive=false
 		player.lives-=1
-				
+		playerremains=1
+
 		playerexplosion={x=player.x,y=player.y,t=1}
 		sfx(2,2)  -- player explode sound
 		
@@ -37,7 +54,7 @@ function playerdeath()
 end
 
 function playercapture()
-	printh("Player Captures: #nmesatt="..#nmesatt..", #nmescap="..#nmescap..", player.lives="..player.lives..", nmealive="..tostr(nmealive)..", playfieldnmes="..playfieldnmes,"log.txt")
+	--printh("Player Captures: #nmesatt="..#nmesatt..", #nmescap="..#nmescap..", player.lives="..player.lives..", nmealive="..tostr(nmealive)..", playfieldnmes="..playfieldnmes,"log.txt")
 	
 	player.alive=false
 	player.lives-=1
@@ -56,16 +73,16 @@ function doboxcollision(sx,sy,tx,ty,size)
   return false
 end
 
-function doboxoverlapcollision(ax,ay,bx,by,size)
-	a={x1=ax,y1=ay,x2=ax+size,y2=ay+size}
-	b={x1=bx,y1=by,x2=bx+size,y2=by+size}
-	return not (
-		a.x2 < b.x1 or
-		a.x1 > b.x2 or
-		a.y2 < b.y1 or
-		a.y1 > b.y2
-	)
-end
+--function doboxoverlapcollision(ax,ay,bx,by,size)
+--	a={x1=ax,y1=ay,x2=ax+size,y2=ay+size}
+--	b={x1=bx,y1=by,x2=bx+size,y2=by+size}
+--	return not (
+--		a.x2 < b.x1 or
+--		a.x1 > b.x2 or
+--		a.y2 < b.y1 or
+--		a.y1 > b.y2
+--	)
+--end
 
 function dorectoverlapcollision(ax,ay,bx,by,asizex,asizey,bsizex,bsizey)
 	a={x1=ax, y1=ay, x2=ax+asizex, y2=ay+asizey}
@@ -111,6 +128,5 @@ function drawplayersprite(ang,set)
 		{playersprites[set][3],true,false},
 		{playersprites[set][2],true,false}
 	}
-	--queue_spr(fram[index][1],x,y,1,1,fram[index][2],fram[index][3])
 	return fram[index]
 end

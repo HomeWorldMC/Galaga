@@ -1,3 +1,1 @@
 
-Player Captures: #nmesatt=0, #nmescap=1, player.lives=2, nmealive=true, playfieldnmes=3
-Player Died: #nmesatt=1, #nmescap=0, player.lives=1, nmealive=true, playfieldnmes=1

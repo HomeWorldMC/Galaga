@@ -24,7 +24,7 @@ function doenemy()
 					playfield[r][c].nme.ay=playfield[r][c].nme.y
 					playfield[r][c].nme.ph=rnd(1)
 
-					if playfield[r][c].nme.typ==3 and #nmescap==0 and flr(rnd(2))==0 and not triedcapturethisstage and player.secondplayer==nil then
+					if playfield[r][c].nme.typ==3 and #nmescap==0 and flr(rnd(2))==0 and not triedcapturethisstage and player.p==1 and gamephase==3 then
 						add(nmescap,playfield[r][c].nme)
 						triedcapturethisstage=true					
 					else
@@ -63,7 +63,7 @@ function doenemy()
 						if playfield[r][c].nme.hascapture then
 							if doboxcollision(playfield[r][c].nme.x,playfield[r][c].nme.y-9,rds.x,rds.y,nmehitboxwidth) then
 								del(rounds,rds)
-								add(explosions,{x=playfield[r][c].nme.x,y=playfield[r][c].nme.y-9,t=1})
+								playerexplosion={x=playfield[r][c].nme.x-4,y=playfield[r][c].nme.y-9,t=1}
 								sfx(1,1)
 								playfield[r][c].nme.hascapture=false
 							else
@@ -127,8 +127,6 @@ function nmeattacking()
 
 			nmeatt.x=slot.x
 			nmeatt.y=slot.y
-			--nmeatt.ax=slot.x
-			--nmeatt.ay=slot.y
 			nmeatt.mode=0
 			
 			slot.nme=nmeatt	
@@ -137,7 +135,7 @@ function nmeattacking()
 			del(nmesatt,nmeatt)
 		end
 		
-		if doboxoverlapcollision(nmeatt.x,nmeatt.y,player.x,player.y,8) and player.alive and not disableplayer and not nmeatt.isimmortal then	
+		if dorectoverlapcollision(nmeatt.x,nmeatt.y,player.x,player.y,8,8,8,8) and player.alive and not disableplayer then
 			playerdeath()
 			sfx(1,1) -- nme explode sound
 			player.score+=(nmescores[nmeatt.typ]*4)
@@ -151,7 +149,7 @@ function nmeattacking()
 				if nmeatt.hascapture then
 					if doboxcollision(nmeatt.x,nmeatt.y-9,r.x,r.y,nmehitboxwidth) then
 						del(rounds,r)
-						add(explosions,{x=nmeatt.x,y=nmeatt.y-9,t=1})
+						playerexplosion={x=nmeatt.x-4,y=nmeatt.y-9,t=1}
 						sfx(1,1)
 						nmeatt.hascapture=false
 					else

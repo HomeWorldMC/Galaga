@@ -43,7 +43,6 @@ function _init()
 		flipy=false
 	}
 
-
 	nmewavespd=1.75
 	wavetimer=3
 	wavecounter=1
@@ -64,38 +63,20 @@ function _init()
 	wavesetval=1
 	playfieldnmes=0
 	pausetimer=2
-
 	tractoron=false
 	tractorendtimer=10
-
 	tractorfx=8
-
 	musicswitch=false
 	challengingmusicswitch=false
 	stagesfx=false
-
-	disableplayer=false
-	
+	disableplayer=false	
 	tcol=1
-
 	trmov=5
 	trdir=1
 
-	triedcapturethisstage=false
+	resetvars() 
+	------
 
-	drawqueue={}
-	tractorqueue={}
-	printqueue={}
-	rectqueue={}
-	swapgamephase=6
-
-	endofstage=false
-
-	numattackers=2
-
-	cycleflag=false
-
-	capturesprt=nil
 
 	initialisestars()
 end
@@ -345,6 +326,10 @@ function _draw()
 	if capturesprt~=nil then 
 		spr(capturesprt.f,capturesprt.x,capturesprt.y,1,1,capturesprt.flipx,capturesprt.flipy)
 	end
+
+	--print("gamephase:"..gamephase,5,70,7)
+	--print("nmealive:"..tostr(nmealive),5,80,7)
+	--print("playfieldnmes:"..playfieldnmes,5,90,7)
 end
 
 function doCSScreen()
@@ -399,14 +384,15 @@ function controls()
 	
 	if btnp(❎) then
 		--if (gamephase==2 or gamephase==3 or (gamephase==6 and swapgamephase==2) or (gamephase==6 and swapgamephase==3)) then
-		if player.alive and rounds~=nil then
-			fire=1
+		if player.alive and rounds~=nil and gamephase~=1 and #rounds<maxrounds then
+			--fire=1
+			firelaser()
 		end
 	end
 	
-	if fire==1 and #rounds<maxrounds then
-		firelaser()
-	end
+	--if fire==1 and #rounds<maxrounds then
+	--	firelaser()
+	--end
 end
 
 function freelifecheck()
@@ -435,6 +421,7 @@ function startgame()
 	gameover=false
 	firsttime=false
 	stage=1
+	playfieldnmes=0
 end
 
 function initialisestage()
@@ -523,7 +510,15 @@ function resetvars()
 	beginruntimer=0
 	playfield={}
 	triedcapturethisstage=false
-	
+	drawqueue={}
+	tractorqueue={}
+	printqueue={}
+	rectqueue={}	
+	swapgamephase=6
+	endofstage=false
+	numattackers=2
+	cycleflag=false
+	capturesprt=nil	
 end
 
 function initialisestars()

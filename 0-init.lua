@@ -193,7 +193,7 @@ function _update60()
 			music(-1)
 		end
 
-		if #nmesatt==0 and #nmescap==0 then
+		if #nmesatt==0 and #nmescap==0 and not tractoron then
 			if not nmealive and playfieldnmes<=0 then
 				if player.alive then -- all waves and formations cleared. move to next stage
 					getshieldnumbers()
@@ -327,7 +327,7 @@ function _draw()
 		spr(capturesprt.f,capturesprt.x,capturesprt.y,1,1,capturesprt.flipx,capturesprt.flipy)
 	end
 
-	--print("gamephase:"..gamephase,5,70,7)
+	print("gamephase:"..gamephase,5,70,7)
 	--print("nmealive:"..tostr(nmealive),5,80,7)
 	--print("playfieldnmes:"..playfieldnmes,5,90,7)
 end
@@ -605,7 +605,7 @@ function dotractorbeam(offx,offy,nme)
 			trmov=41
 		end	
 
-		if dorectoverlapcollision(player.x,player.y,offx+6,offy,6,8,10,39) and not disableplayer and tractoron then
+		if dorectoverlapcollision(player.x,player.y,offx+6,offy,6,8,10,39) and not disableplayer and tractoron and player.alive then
 			disableplayer=true			
 
 			cycle(4, 0.0266, function(ang, r)

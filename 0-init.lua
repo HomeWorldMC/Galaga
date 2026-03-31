@@ -327,7 +327,7 @@ function _draw()
 		spr(capturesprt.f,capturesprt.x,capturesprt.y,1,1,capturesprt.flipx,capturesprt.flipy)
 	end
 
-	print("gamephase:"..gamephase,5,70,7)
+	--print("gamephase:"..gamephase,5,70,7)
 	--print("nmealive:"..tostr(nmealive),5,80,7)
 	--print("playfieldnmes:"..playfieldnmes,5,90,7)
 end

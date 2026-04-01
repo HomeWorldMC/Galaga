@@ -300,7 +300,7 @@ end
 function _draw()
 	cls(0)
 	dostarfield()
-
+	animatestars()
 
 	
 	--flush_rectfillq()
@@ -383,16 +383,10 @@ function controls()
 	end
 	
 	if btnp(❎) then
-		--if (gamephase==2 or gamephase==3 or (gamephase==6 and swapgamephase==2) or (gamephase==6 and swapgamephase==3)) then
 		if player.alive and rounds~=nil and gamephase~=1 and #rounds<maxrounds then
-			--fire=1
 			firelaser()
 		end
 	end
-	
-	--if fire==1 and #rounds<maxrounds then
-	--	firelaser()
-	--end
 end
 
 function freelifecheck()
@@ -751,8 +745,12 @@ function stageUI()
 end
 
 function maingame()
-	doenemy()
 	dowave()
+	doplayfieldmovement()
+	doplayfield()
+	doattacking()
+	docapture()
+
 	if gamephase~=5 then
 		doplayer()
 	end
@@ -792,19 +790,3 @@ function prepwaves()
 		end
 	end
 end
-
---function dolog(num)
---	if num=="gamephase-info-moving" then
---		printh("Moving from - gamephase="..gamephase..", swapgamephase="..swapgamephase..". Is challenging stage: "..tostr(ischallengingstage),"log.txt")	
---	elseif num=="gamephase-info-to" then
---		printh("	to - gamephase="..gamephase..", swapgamephase="..swapgamephase,"log.txt")
---	elseif num=="gamephase-info-switched" then
---		printh("	switched - gamephase="..gamephase..". swapgamephase="..swapgamephase,"log.txt")
---	elseif num=="gamephase-info-moving2" then
---		printh("Moving from - gamephase="..gamephase.." to 1, is challenging stage: "..tostr(ischallengingstage),"log.txt")
---	elseif num=="show-stage-title" then
---		printh("--show Stage title--","log.txt")
---	else
---		printh("{no log entry for that}","log.txt")
---	end
---end

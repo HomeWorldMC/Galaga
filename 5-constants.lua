@@ -25,6 +25,8 @@ function initialiseconstants()
 	logfile="log.txt"
 	printh("","log.txt",true)
 
+	sp={x=0,y=0,hp=1,typ=3}
+
     typ={3,1,1,2,2}
 	hp={2,1,1,1,1}
 
@@ -46,6 +48,8 @@ function initialiseconstants()
 	nmeymovespd=0.85
 	missilemovespd=1.55
 
+	xoffset={5,5,8,8,8,8}
+
     beeslots={{5,5},{5,6},{4,5},{4,6},{5,4},{5,3},{4,4},{4,3},{5,7},{5,8},{4,7},{4,8},{5,2},{5,1},{4,2},{4,1},{5,9},{5,10},{4,9},{4,10}}
 	mothslots={{3,5},{3,6},{2,5},{2,6},{3,4},{3,3},{2,4},{2,3},{3,7},{3,8},{2,7},{2,8},{3,2},{2,2},{3,9},{2,9}}
 	bossslots={{1,5},{1,6},{1,4},{1,7}} 
@@ -53,6 +57,8 @@ function initialiseconstants()
 	textcol=6
 
 	capturedplayer={x=0,y=0,f=23}
+
+	xo={4,7,0}
 
 	waves={
 		{

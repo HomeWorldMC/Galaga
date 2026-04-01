@@ -1,39 +1,39 @@
-function doenemy()
+function doplayfieldmovement()
 	if (playfield[1][10].x>fieldboundmax or playfield[1][1].x<fieldboundmin) then
 		nmexmovespd=nmexmovespd*-1
 	end	
 
-	beginruntimer-=0.15
-	
+	beginruntimer-=0.15	
 	nmecount=0	
+	
 	for r=1,#playfield do -- move enemy and roll deice for attack run
 		for c=1,#playfield[r] do
-			playfield[r][c].x+=nmexmovespd
+			local pf=playfield[r][c]
+
+			pf.x+=nmexmovespd
 			
-			if not playfield[r][c].canwrite and playfield[r][c].nme.mode==0 then	
+			if not pf.canwrite and pf.nme.mode==0 then	
 				nmecount+=1
-				playfield[r][c].nme.x=playfield[r][c].x
-
-				-- check to see if nme does attack run
-				if beginruntimer<0 and flr(rnd(nmecount*4)+1)==1 and #nmesatt<numattackers and playfield[r][c].nme.mode==0 
-					and player.alive and gamephase==3 and not disableplayer then
-
+				pf.nme.x=pf.x
+				
+				if beginruntimer<0 and flr(rnd(nmecount*4)+1)==1 and #nmesatt<numattackers and player.alive and gamephase==3 and not disableplayer then
 					beginruntimer=4
-					playfield[r][c].nme.mode=1
-					playfield[r][c].nme.ax=playfield[r][c].nme.x
-					playfield[r][c].nme.ay=playfield[r][c].nme.y
-					playfield[r][c].nme.ph=rnd(1)
+					pf.nme.mode=1
+					pf.nme.ax=pf.nme.x
+					pf.nme.ay=pf.nme.y
+					pf.nme.ph=rnd(1)
 
-					if playfield[r][c].nme.typ==3 and #nmescap==0 and flr(rnd(2))==0 and not triedcapturethisstage and player.p==1 and gamephase==3 then
-						add(nmescap,playfield[r][c].nme)
+					if pf.nme.typ==3 and #nmescap==0 and flr(rnd(2))==0 and not triedcapturethisstage and player.p==1 and gamephase==3 then
+						add(nmescap,pf.nme)
 						triedcapturethisstage=true					
 					else
-						add(nmesatt,playfield[r][c].nme)
-						doenemyfireroll(playfield[r][c].nme,true,0,70)
+						add(nmesatt,pf.nme)
+						doenemyfireroll(pf.nme,true,0,70)
 					end
 
-					playfield[r][c].canwrite=true
-					playfield[r][c].holdslot=false
+					pf.canwrite=true
+					pf.holdslot=false
+
 					playfieldnmes-=1						
 					sfx(6,3) -- nme attack run sound
 				end	
@@ -44,132 +44,126 @@ function doenemy()
 	if beginruntimer<=0 then
 		beginruntimer=4
 	end	
-	
-	-- do the attack run for nme's in the nmeatt collection
-	if #nmesatt>0 then nmeattacking() end
+end
 
-	docapture()
-
+function doplayfield()
 	nmealive=false
 	
-	-- here we are doing the collision checks for non-attacking nme
-	-- we're also checking if any are alive for the nmeallalive flag
 	for r=1,#playfield do
 		for c=1,#playfield[r] do
-			if not playfield[r][c].canwrite and playfield[r][c].nme.mode~=2then
+			local pf=playfield[r][c]
+
+			if not pf.canwrite and pf.nme.mode~=2 then
 				nmealive=true
-				if #rounds > 0 and (playfield[r][c].nme.mode==0 or playfield[r][c].nme.mode==1) then
+				if #rounds > 0 and (pf.nme.mode==0 or pf.nme.mode==1) then
 					for rds in all(rounds) do
-						if playfield[r][c].nme.hascapture then
-							if doboxcollision(playfield[r][c].nme.x,playfield[r][c].nme.y-9,rds.x,rds.y,nmehitboxwidth) then
-								del(rounds,rds)
-								playerexplosion={x=playfield[r][c].nme.x-4,y=playfield[r][c].nme.y-9,t=1}
-								sfx(1,1)
-								playfield[r][c].nme.hascapture=false
-							else
-								checkrounds(playfield[r][c].nme,rds,1,r,c,1)
-							end
+						if checkrounds(pf.nme,rds,1) then
+							pf.nme.mode=2
+							pf.canwrite=true	
+							playfieldnmes-=1
 						else
-							checkrounds(playfield[r][c].nme,rds,1,r,c,1)
+							if pf.nme.hascapture then
+								if checkrounds({x=pf.nme.x,y=pf.nme.y-9,hp=1,typ=3},rds,1) then
+									pf.nme.hascapture=false
+								end
+							end	
 						end
 					end
 				end
-				drawsprite(playfield[r][c].nme,false)
-				if playfield[r][c].nme.hascapture then
-					queue_spr(23, playfield[r][c].nme.x, playfield[r][c].nme.y-9, 1, 1, false, false)
+				drawsprite(pf.nme,false)
+				if pf.nme.hascapture then
+					queue_spr(23, pf.nme.x, pf.nme.y-9, 1, 1, false, false)
 				end
 			end
 		end
 	end
 end
 
-function nmeattacking()
-	local dx
-	local dy
-	local nmeatt
-	
-	for i = #nmesatt,1,-1 do
-		nmeatt=nmesatt[i]
+function doattacking()
+	if #nmesatt>0 then
+		local dx
+		local dy
+		local nmeatt
 		
-		if nmeatt.sw==-1 then
-			nmeatt.ph-=0.005
-			if nmeatt.ph<=0.5 then
-				--nmeatt.ph=1
-				nmeatt.sw=nmeatt.sw*-1
-			end		
-		else
-			nmeatt.ph+=0.005
-			if nmeatt.ph>=1 then
-				--nmeatt.ph=0
-				nmeatt.sw=nmeatt.sw*-1
-			end	
-		end
-		
-		nmeatt.lax=nmeatt.x
-		nmeatt.lay=nmeatt.y	
-		nmeatt.x+=0.5*cos(nmeatt.ph)
-		nmeatt.y+= nmeymovespd
-		
-		dx = (nmeatt.lax-nmeatt.x)
-		dy = (nmeatt.lay-nmeatt.y)
-		ang = atan2( dx, dy )
-		
-		if	nmeatt.x <fieldboundmin then
-			nmeatt.x=fieldboundmin
-		end
-		
-		if	nmeatt.x>fieldboundmax then
-			nmeatt.x=fieldboundmax
-		end
-		
-		if nmeatt.y>128 then
-			local slot=playfield[nmeatt.row][nmeatt.col]
-
-			nmeatt.x=slot.x
-			nmeatt.y=slot.y
-			nmeatt.mode=0
+		for i = #nmesatt,1,-1 do
+			nmeatt=nmesatt[i]
 			
-			slot.nme=nmeatt	
-			slot.canwrite=false
+			if nmeatt.sw==-1 then
+				nmeatt.ph-=0.005
+				if nmeatt.ph<=0.5 then
+					nmeatt.sw=nmeatt.sw*-1
+				end		
+			else
+				nmeatt.ph+=0.005
+				if nmeatt.ph>=1 then
+					nmeatt.sw=nmeatt.sw*-1
+				end	
+			end
+			
+			nmeatt.lax=nmeatt.x
+			nmeatt.lay=nmeatt.y	
+			nmeatt.x+=0.5*cos(nmeatt.ph)
+			nmeatt.y+= nmeymovespd
+			
+			dx = (nmeatt.lax-nmeatt.x)
+			dy = (nmeatt.lay-nmeatt.y)
+			ang = atan2( dx, dy )
+			
+			if	nmeatt.x <fieldboundmin then
+				nmeatt.x=fieldboundmin
+			end
+			
+			if	nmeatt.x>fieldboundmax then
+				nmeatt.x=fieldboundmax
+			end
+			
+			if nmeatt.y>128 then
+				local slot=playfield[nmeatt.row][nmeatt.col]
 
-			del(nmesatt,nmeatt)
-		end
-		
-		if dorectoverlapcollision(nmeatt.x,nmeatt.y,player.x,player.y,8,8,8,8) and player.alive and not disableplayer then
-			playerdeath()
-			sfx(1,1) -- nme explode sound
-			player.score+=(nmescores[nmeatt.typ]*4)
-			add(explosions,{x=nmeatt.x,y=nmeatt.y,t=1})
-			del(nmesatt,nmeatt)
-			freelifecheck()	
-		end		
-		
-		if #rounds > 0 then
-			for r in all(rounds) do
-				if nmeatt.hascapture then
-					if doboxcollision(nmeatt.x,nmeatt.y-9,r.x,r.y,nmehitboxwidth) then
-						del(rounds,r)
-						playerexplosion={x=nmeatt.x-4,y=nmeatt.y-9,t=1}
-						sfx(1,1)
-						nmeatt.hascapture=false
-					else
-						if checkrounds(nmeatt,r,4,0,0,2) and nmeatt.hp==0 then
-							-- do fighter reclaim stuff here
+				nmeatt.x=slot.x
+				nmeatt.y=slot.y
+				nmeatt.mode=0
+				
+				slot.nme=nmeatt	
+				slot.canwrite=false
+
+				del(nmesatt,nmeatt)
+			end
+			
+			if dorectoverlapcollision(nmeatt.x,nmeatt.y,player.x,player.y,8,8,8,8) and player.alive and not disableplayer then
+				playerdeath()
+				sfx(1,1) -- nme explode sound
+				player.score+=(nmescores[nmeatt.typ]*4)
+				add(explosions,{x=nmeatt.x,y=nmeatt.y,t=1})
+				del(nmesatt,nmeatt)
+				freelifecheck()	
+			end		
+			
+			if #rounds > 0 then
+				for r in all(rounds) do
+					if checkrounds(nmeatt,r,4) then
+						del(nmesatt,nmeatt)
+						if nmeatt.hascapture then
 							dorecapture(nmeatt)
 						end
-						
+					else
+						if nmeatt.hascapture then
+							sp.x=nmeatt.x
+							sp.y=nmeatt.y-9
+							if checkrounds(sp,r,1) then
+								nmeatt.hascapture=false
+							end
+						end
 					end
-				else
-					checkrounds(nmeatt,r,4,0,0,2)
 				end
 			end
-		end
-			
-		drawrotatesprite(ang,nmeatt.x,nmeatt.y,nmeatt)
-		if nmeatt.hascapture then
-			queue_spr(23, nmeatt.x+1, nmeatt.y-9, 1, 1, false, false)
-		end
-	end	
+				
+			drawrotatesprite(ang,nmeatt.x,nmeatt.y,nmeatt)
+			if nmeatt.hascapture then
+				queue_spr(23, nmeatt.x+1, nmeatt.y-9, 1, 1, false, false)
+			end
+		end	
+	end
 end
 
 function findemptyslot(t)
@@ -239,9 +233,7 @@ function drawsprite(nme,flipy)
 		end
 	end
 	nme.f=fr
-	--add(drawqueue,{s=nme.f,x=nme.x,y=nme.y,w=1,h=1,flix=false,flipy=flipy})
 	queue_spr(nme.f,nme.x,nme.y,1,1,false,flipy)
-	--spr(nme.f,nme.x,nme.y,1,1,false,flipy)
 end
 
 function drawrotatesprite(ang,x,y,nme)
@@ -299,6 +291,7 @@ function dowave()
 		local disttonext
 		local maxnodes=0
 		local path={}
+		local slot
 		
 		path=fetchpath(nme.path)
 		maxnodes=#path
@@ -309,7 +302,7 @@ function dowave()
 			
 			if nme.index==maxnodes then
 				if not ischallengingstage then
-					local slot=findemptyslot(nme.typ)
+					slot=findemptyslot(nme.typ)
 					
 					nme.col=slot.col
 					nme.row=slot.row
@@ -349,7 +342,7 @@ function dowave()
 		if nme.index>maxnodes then
 			if not ischallengingstage then
 				
-				local slot=playfield[nme.row][nme.col]
+				slot=playfield[nme.row][nme.col]
 
 				nme.x=slot.x
 				nme.y=slot.y
@@ -373,17 +366,13 @@ function dowave()
 		
 		if #rounds > 0 and nme.mode==3 then
 			for r in all(rounds) do
-				if nme.hascapture then
-					if doboxcollision(nme.x,nme.y-9,r.x,r.y,nmehitboxwidth) then
-						del(rounds,r)
-						add(explosions,{x=nme.x,y=nme.y-9,t=1})
-						sfx(1,1)
-						nme.hascapture=false
-					else
-						checkrounds(nme,r,1,0,0,3)
+				if checkrounds(nme,r,1) then
+					nmewavenmes-=1
+					nme.mode=2
+					if nme.row>0 and nme.col>0 then
+						playfield[nme.row][nme.col].holdslot=false
 					end
-				else
-					checkrounds(nme,r,1,0,0,3)
+					del(twave,nme)
 				end
 			end
 		end
@@ -413,27 +402,22 @@ function docapture()
 		local disttonext
 		local maxnodes=0
 		local path={}
+		local slot
 		
 		path=paths[8]
 		maxnodes=#path
 
-		--printh("path:"..#path,"log.txt")
-		--printh("nme.index:"..nme.index,"log.txt")
 		if nme.index~=6 then
 			if not tractoron then
 				if nme.st==0 then
 					nme.st=1			
-					--fromnode=path[nme.index]
 					fromnode={x=nme.x,y=nme.y}
 					
-					--printh("fromnode:"..tostr(fromnode),"log.txt")
-					
 					if nme.index==maxnodes then
-						local slot=playfield[nme.row][nme.col]
+						slot=playfield[nme.row][nme.col]
 						tonode={x=slot.x,y=slot.y}				
 					else 
 						tonode=path[nme.index+1]
-						--("fromnode:{x="..fromnode.x..",y="..fromnode.y.."}. tonode:{x="..tonode.x..",y="..tonode.y.."}.","log.txt")
 					end
 					
 					nme.ph = atan2( (fromnode.x-tonode.x), (fromnode.y-tonode.y) )
@@ -441,13 +425,9 @@ function docapture()
 					nme.y=fromnode.y
 					nme.ax=tonode.x
 					nme.ay=tonode.y
-					
-					--printh("first time - nme:{ax="..nme.ax..",ay="..nme.ay.."}. nme:{x="..nme.x..",y="..nme.y.."}.","log.txt")
 				else 
 					dx=nme.ax-nme.x
 					dy=nme.ay-nme.y
-
-					--printh("nme:{ax="..nme.ax..",ay="..nme.ay.."}. nme:{x="..nme.x..",y="..nme.y.."}.","log.txt")
 				
 					dist = sqrt(dx*dx + dy*dy)
 				
@@ -459,7 +439,6 @@ function docapture()
 				end
 
 				disttonext = (abs(nme.x-nme.ax)+abs(nme.y-nme.ay)) 
-				--printh("nmewavespd:"..tostr(nmewavespd).."disttonext:"..tostr(disttonext),"log.txt")
 
 				if disttonext<nmewavespd then
 					nme.index+=1
@@ -467,7 +446,7 @@ function docapture()
 				end
 				
 				if nme.index>maxnodes then
-					local slot=playfield[nme.row][nme.col]
+					slot=playfield[nme.row][nme.col]
 
 					nme.x=slot.x
 					nme.y=slot.y
@@ -480,6 +459,7 @@ function docapture()
 					slot.canwrite=false
 					slot.holdslot=false
 					nme.index=1
+
 					playfieldnmes+=1
 				
 					del(nmescap,nme)
@@ -496,53 +476,10 @@ function docapture()
 
 		if #rounds > 0 then
 			for r in all(rounds) do
-				if nme.hascapture then
-					if doboxcollision(nme.x,nme.y-9,r.x,r.y,nmehitboxwidth) then
-						del(rounds,r)
-						add(explosions,{x=nme.x,y=nme.y-9,t=1})
-						sfx(1,1)
-						nme.hascapture=false
-					else
-						if doboxcollision(nme.x,nme.y,r.x,r.y,nmehitboxwidth) and not disableplayer and not nme.isimmortal then
-							--local pfslot=playfield[nmeatt.row][nmeatt.col].nmeatt
-
-							if nme.hp>1 then
-								nme.hp-=1
-							else
-								sfx(1,1) -- nme explode sound
-								player.score+=(nmescores[nme.typ]*4)
-
-								add(explosions,{x=nme.x,y=nme.y,t=1})
-								del(nmescap,nme)
-								freelifecheck()	
-								tractoron=false
-								resettractor()
-								stagekills+=1
-							end
-						
-							del(rounds,r)
-						end
-					end
-				else
-					if doboxcollision(nme.x,nme.y,r.x,r.y,nmehitboxwidth) and not disableplayer and not nme.isimmortal then
-						--local pfslot=playfield[nmeatt.row][nmeatt.col].nmeatt
-
-						if nme.hp>1 then
-							nme.hp-=1
-						else
-							sfx(1,1) -- nme explode sound
-							player.score+=(nmescores[nme.typ]*4)
-
-							add(explosions,{x=nme.x,y=nme.y,t=1})
-							del(nmescap,nme)
-							freelifecheck()	
-							tractoron=false
-							resettractor()
-							stagekills+=1
-						end
-					
-						del(rounds,r)
-					end
+				if checkrounds(nme,r,4) and not disableplayer and not nme.isimmortal then
+					tractoron=false
+					resettractor()
+					del(nmescap,nme)
 				end
 			end
 		end
@@ -569,11 +506,12 @@ function doenemyfireroll(nme,st,min,max)
 	end
 end
 
-function checkrounds(nme,round,bonus,row,col,typ)
+function checkrounds(nme,round,bonus)
 	if doboxcollision(nme.x,nme.y,round.x,round.y,nmehitboxwidth) and not disableplayer and not nme.isimmortal then	
 		del(rounds,round)
 		if nme.hp>1 then
 			nme.hp-=1
+			return false
 		else
 			nme.hp-=1
 			sfx(1,1) -- nme explode sound
@@ -581,28 +519,8 @@ function checkrounds(nme,round,bonus,row,col,typ)
 			add(explosions,{x=nme.x,y=nme.y,t=1})
 			freelifecheck()
 			stagekills+=1
-
-			-- type 1
-			if typ==1 then
-				nme.mode=2
-				playfield[row][col].canwrite=true	
-				playfieldnmes-=1
-			end
-
-			if typ==2 then
-				del(nmesatt,nme)
-			end
-
-			if typ==3 then
-				nmewavenmes-=1
-				nme.mode=2
-				if nme.row>0 and nme.col>0 then
-					playfield[nme.row][nme.col].holdslot=false
-				end
-				del(twave,nme)
-			end
-		end
-		return true
+			return true
+		end		
 	end	
 	return false
 end

@@ -7,7 +7,7 @@ function _init()
 
 	initialiseconstants()
 	
-	invince=false
+	invince=true
 	if invince then
 		maxrounds=5
 		musicstart=3
@@ -629,7 +629,7 @@ function dotractorbeam(offx,offy,nme)
 		trmov=5
 		tractorendtimer=10
 		-- do next fighter routines	
-		
+		music(-1)
 		if disableplayer then
 			playercapture()			
 			nme.hascapture=true

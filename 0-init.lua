@@ -73,6 +73,7 @@ function _init()
 	tcol=1
 	trmov=5
 	trdir=1
+	capturepause=5
 
 	resetvars() 
 	------
@@ -190,7 +191,7 @@ function _update60()
 		end
 
 		if not tractoron then
-			music(-1)
+			--music(-1)
 		end
 
 		if #nmesatt==0 and #nmescap==0 and not tractoron then
@@ -327,9 +328,12 @@ function _draw()
 		spr(capturesprt.f,capturesprt.x,capturesprt.y,1,1,capturesprt.flipx,capturesprt.flipy)
 	end
 
-	--print("gamephase:"..gamephase,5,70,7)
-	--print("nmealive:"..tostr(nmealive),5,80,7)
-	--print("playfieldnmes:"..playfieldnmes,5,90,7)
+	--print("gamephase:"..gamephase,5,60,7)
+	--print("#nmesatt:"..#nmesatt,5,70,7)
+	--print("#nmescap:"..#nmescap,5,80,7)
+	--print("nmecount:"..nmecount,5,90,7)
+	--print("nmealive:"..tostr(nmealive),5,100,7)
+	
 end
 
 function doCSScreen()
@@ -588,7 +592,7 @@ function dotractorbeam(offx,offy,nme)
 	pal(15,tcols[(ind+2)%3+1],1)	
 
 	trmov+=0.35*trdir
-	if trmov>40  then 		
+	if trmov>40 then 		
 		tractorendtimer-=0.075
 		if tractorendtimer<0 then
 			tractorfx=10
@@ -601,7 +605,7 @@ function dotractorbeam(offx,offy,nme)
 
 		if dorectoverlapcollision(player.x,player.y,offx+6,offy,6,8,10,39) and not disableplayer and tractoron and player.alive then
 			disableplayer=true			
-
+			
 			cycle(4, 0.0266, function(ang, r)
 				local s
 				if r>2 then
@@ -625,9 +629,19 @@ function dotractorbeam(offx,offy,nme)
 		trmov=5
 		tractorendtimer=10
 		-- do next fighter routines	
+		
 		if disableplayer then
 			playercapture()			
 			nme.hascapture=true
+			music(12)
+
+			cycle(4, 0.03, 
+				function()					
+					queue_prt("fighter captured",32,70,8)
+				end
+			)
+
+			--queue_prt("fighter captured",32,49,8)
 		end
 	end
 end
@@ -636,8 +650,8 @@ function dorecapture(nme)
 	disableplayer=true
 	capturesprt={x=nme.x+1,y=nme.y-9,f=16,flipx=false,flipy=false}
 	cycleflag=true
-
-	cycle(2, 0.0266, 
+	music(13)
+	cycle(4, 0.0266, 
 		function(ang, r)
 			local sp=drawplayersprite(ang,1)
 			capturesprt.f=sp[1]
@@ -654,6 +668,7 @@ function dorecapture(nme)
 			player.p=2
 			player.x=64
 			player.y=116
+			music(-1)
 		end  
 	)
 	move(2,{x=player.x,y=player.y},{x=60,y=116},player)

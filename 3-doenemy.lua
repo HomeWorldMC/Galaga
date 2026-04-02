@@ -34,12 +34,14 @@ function doplayfieldmovement()
 					pf.canwrite=true
 					pf.holdslot=false
 
-					playfieldnmes-=1						
+					--playfieldnmes-=1						
 					sfx(6,3) -- nme attack run sound
 				end	
 			end
 		end
 	end	
+
+	playfieldnmes = nmecount
 	
 	if beginruntimer<=0 then
 		beginruntimer=4
@@ -60,7 +62,7 @@ function doplayfield()
 						if checkrounds(pf.nme,rds,1) then
 							pf.nme.mode=2
 							pf.canwrite=true	
-							playfieldnmes-=1
+							--playfieldnmes-=1
 						else
 							if pf.nme.hascapture then
 								if checkrounds({x=pf.nme.x,y=pf.nme.y-9,hp=1,typ=3},rds,1) then
@@ -126,7 +128,7 @@ function doattacking()
 				
 				slot.nme=nmeatt	
 				slot.canwrite=false
-
+				playfieldnmes+=1
 				del(nmesatt,nmeatt)
 			end
 			

@@ -69,17 +69,6 @@ function doboxcollision(sx,sy,tx,ty,size)
   return false
 end
 
---function doboxoverlapcollision(ax,ay,bx,by,size)
---	a={x1=ax,y1=ay,x2=ax+size,y2=ay+size}
---	b={x1=bx,y1=by,x2=bx+size,y2=by+size}
---	return not (
---		a.x2 < b.x1 or
---		a.x1 > b.x2 or
---		a.y2 < b.y1 or
---		a.y1 > b.y2
---	)
---end
-
 function dorectoverlapcollision(ax,ay,bx,by,asizex,asizey,bsizex,bsizey)
 	a={x1=ax, y1=ay, x2=ax+asizex, y2=ay+asizey}
 	b={x1=bx, y1=by, x2=bx+bsizex, y2=by+bsizey}

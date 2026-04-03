@@ -576,11 +576,13 @@ function initialisestars()
 end
 
 function doexplosions()
+	
 	for n=#explosions,1,-1 do
-		queue_spr(explosionsframes[flr(explosions[n].t)],explosions[n].x,explosions[n].y,1,1,false,false)
-		explosions[n].t+=explosionspd
-		if explosions[n].t>(6-explosionspd) then
-			del(explosions,explosions[n])
+		local exp=explosions[n]
+		queue_spr(explosionsframes[flr(exp.t)],exp.x,exp.y,1,1,false,false)
+		exp.t+=explosionspd
+		if exp.t>(6-explosionspd) then
+			del(explosions,exp)
 		end
 	end
 end
@@ -596,10 +598,23 @@ function doplayerexplosion()
 end
 
 function fetchpath(p)
-	if sub(p,2,2)=="b" then
-		return flippath(paths[tonum(sub(p,1,1))])
+	-- 9,10
+	local index
+	local alt
+
+	if sub(p,2,2)~="a" and sub(p,2,2)~="b" then
+		index=tonum(sub(p,1,2))
+		alt=sub(p,3,3)
 	else
-		return paths[tonum(sub(p,1,1))]
+		index=tonum(sub(p,1,1))
+		alt=sub(p,2,2)
+	end
+
+
+	if alt=="b" then
+		return flippath(paths[index])
+	else
+		return paths[index]
 	end
 end
 

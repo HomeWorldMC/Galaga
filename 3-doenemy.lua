@@ -14,8 +14,10 @@ function doplayfieldmovement()
 			if not pf.canwrite and pf.nme.mode==0 then	
 				pf.nme.x=pf.x
 				
-				if beginruntimer<0 and flr(rnd(nmesinplay*4)+1)==1 and #nmesatt<numattackers and player.alive and gamephase==3 and not disableplayer then
-					beginruntimer=4
+				local shouldattack = flr(rnd(nmesinplay*beginruntimermax)+1)
+				
+				if beginruntimer<0 and (shouldattack>=1 and shouldattack<40) and #nmesatt<numattackers and player.alive and gamephase==3 and not disableplayer then
+					beginruntimer=beginruntimermax
 					pf.nme.mode=1
 					pf.nme.ax=pf.nme.x
 					pf.nme.ay=pf.nme.y
@@ -26,7 +28,6 @@ function doplayfieldmovement()
 						triedcapturethisstage=true					
 					else
 						add(nmesatt,pf.nme)
-						doenemyfireroll(pf.nme,true,0,70)
 					end
 
 					pf.canwrite=true
@@ -39,7 +40,7 @@ function doplayfieldmovement()
 	end	
 	
 	if beginruntimer<=0 then
-		beginruntimer=4
+		beginruntimer=beginruntimermax
 	end	
 end
 
@@ -80,6 +81,10 @@ function doattacking()
 		
 		for i = #nmesatt,1,-1 do
 			nmeatt=nmesatt[i]
+
+			if not nmeatt.hasfired then
+				doenemyfireroll(nmeatt,true,0,70) -- <-- value might get higher as stage number grows
+			end
 			
 			if nmeatt.sw==-1 then
 				nmeatt.ph-=0.005
@@ -116,6 +121,7 @@ function doattacking()
 				nmeatt.x=slot.x
 				nmeatt.y=slot.y
 				nmeatt.mode=0
+				nmeatt.hasfired=false
 				
 				slot.nme=nmeatt	
 				slot.canwrite=false
@@ -273,7 +279,6 @@ function drawrotatesprite(ang,x,y,nme)
 end
 
 function dowave()
-	local cyclespersegment=15
 	for i=#twave,1,-1 do
 		local fromnode
 		local tonode
@@ -355,6 +360,7 @@ function dowave()
 
 			del(twave,nme)
 			nmewavenmes-=1
+			nme.hasfired=false
 		end
 		
 		if #rounds > 0 and nme.mode==3 then
@@ -370,8 +376,8 @@ function dowave()
 			end
 		end
 		if stage>1 then
-			if not ischallengingstage then
-				doenemyfireroll(nme,false,40,60)
+			if not ischallengingstage and not nme.hasfired then
+				doenemyfireroll(nme,false,20,60)
 			end
 		end
 
@@ -383,7 +389,6 @@ end
 
 function docapture()
 	if #nmescap>0 then
-		local cyclespersegment=15
 		local fromnode
 		local tonode
 		local nme=nmescap[1]	
@@ -486,8 +491,8 @@ function docapture()
 end
 
 function doenemyfireroll(nme,st,min,max)
-	local rndm=rnd(4)
-	if flr((rndm==1 or rndm==2 or rndm==3)) and player.alive and #nmerounds<7 and (nme.y>min and nme.y<max) and (firesduringwave<maxfiresperwave or st) then
+	local rndm=flr(rnd(6))
+	if (rndm==1 or rndm==2 or rndm==3) and player.alive and #nmerounds<nmeroundsmax and (nme.y>min and nme.y<max) and (firesduringwave<nmeroundsmax or st) then
 		local dx = (player.x+3) - nme.x
 		local dy = (player.y+2) - nme.y
 
@@ -497,6 +502,7 @@ function doenemyfireroll(nme,st,min,max)
 		
 		add(nmerounds,{x=nme.x,y=nme.y,vx=velx,vy=vely,tx=player.x,ty=player.y})
 		firesduringwave+=1
+		nme.hasfired=true
 	end
 end
 

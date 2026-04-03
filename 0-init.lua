@@ -1,10 +1,4 @@
 function _init()
-	-- disable key repeat
-	
-	--poke(0x5f2e, 1)
-
-	--spare colors 15,2,11
-
 	initialiseconstants()
 	
 	invince=false
@@ -44,15 +38,23 @@ function _init()
 		flipy=false
 	}
 
-	nmewavespd=1.75
+	-- difficulty level vars
+	--nmeymovespd=0.85 -- faster attacking (increase by 0.1 every 10 rounds)
+	--nmeroundsmax=3 -- max number of rounds nmes can have on screen at once (increase by 1 every 4 stages, to a max of 8)
+	--beginruntimermax=4 -- time between successive attacks - diving or capturing (currently using this sum : 4-(flr(stage/10)))
+	--numattackersmax=2 -- total number of attackers that can be on screen
+
+
+
+	nmewavespd=0
 	wavetimer=3
+	
 	wavecounter=1
 	starsx={}
 	starsy={}
 	twave={}
 	nmewavenmes=0
 	stage=1
-	maxfiresperwave=2
 	musicstate=-1
 	sfxon=false
 	jankymusictimer=0
@@ -78,6 +80,19 @@ function _init()
 	trdir=1
 	capturepause=5
 
+	
+
+
+	--3 at stage 1
+--
+	--4 at stage 4
+--
+	--5 at stage 8
+--
+	--7 at stage 16
+
+
+ 
 	resetvars() 
 	------
 
@@ -103,7 +118,7 @@ function _update60()
 		nmesinplay = playfieldnmes + #nmescap + #nmesatt
 	end
 	-------------
-	
+
 	update_timers(1/30)
 	update_cycletimers()
 	update_movetimers(1)
@@ -138,10 +153,10 @@ function _update60()
 		-- check if this stage is a challenging stage
 		if (stage+1)%4==0 then
 			ischallengingstage=true
-			nmewavespd=1.25		
+			nmewavespd=1.30	
 		else
 			ischallengingstage=false
-			nmewavespd=1.75
+			nmewavespd=2
 		end
 
 		getshieldnumbers()
@@ -324,8 +339,6 @@ function _draw()
 	dostarfield()
 	animatestars()
 
-	
-	--flush_rectfillq()
 	flush_drawq()
 	flush_drawqt()
 	flush_rectq()
@@ -337,23 +350,15 @@ function _draw()
 
 	rect(0,0,127,127,7)
 
-	
-
-	flush_printq()
-	--if #movetimers>0 then
-	-- 	print("moving stuff",5,90,7) 
-	--else
-	--	print("finished moving stuff",5,90,7) 
-	--end
 	if capturesprt~=nil then
 		spr(capturesprt.f,capturesprt.x,capturesprt.y,1,1,capturesprt.flipx,capturesprt.flipy)
 	end
 
-	--print("gamephase:"..gamephase,5,60,7)
-	--print("nmesinplay:"..nmesinplay,5,70,7)
-	--if nmesinplay~=lastnmesinplay then
-	--	print("GAP!!!!!!",5,80,7)
-	--end
+	--print("nmeymovespd:"..nmeymovespd,5,70,7)
+	--print("maxfiresperwave:"..maxfiresperwave,5,80,7)
+	--print("nmeroundsmax:"..nmeroundsmax,5,90,7)
+	--print("beginruntimermax:"..beginruntimermax,5,100,7)
+	--print("numattackersmax:"..numattackersmax,5,110,7)
 end
 
 function doCSScreen()
@@ -388,22 +393,27 @@ end
 
 function controls() 
 	if btn(⬅️) or btn(0,1) then
-		if player.x>5 then
-			player.x-=shipspeedx
+		if player.p>1 then
+			if player.x>7 then
+				player.x-=shipspeedx
+			end
+		else
+			if player.x>3 then
+				player.x-=shipspeedx
+			end
 		end
 	end
 	
 	if btn(➡️) or btn(1,1) then
 		if player.p>1 then
-			if player.x<109 then
+			if player.x<116 then
 				player.x+=shipspeedx
 			end
 		else
-			if player.x<117 then
+			if player.x<119 then
 				player.x+=shipspeedx
 			end
-		end
-		
+		end		
 	end
 	
 	if btnp(❎) or btnp(4,1) then
@@ -443,6 +453,20 @@ function startgame()
 end
 
 function initialisestage()
+	-- difficulty vars
+	nmeymovespd=0.85 + (stage/100)
+	if nmeymovespd>1.05 then nmeymovespd=1.05 end
+
+	nmeroundsmax= 3 + flr((0.125*stage))
+	if nmeroundsmax>8 then nmeroundsmax=8	end
+
+	numattackersmax=2+flr((0.1*stage))
+	if numattackersmax>5 then numattackersmax=5 end
+
+	beginruntimermax=4-(flr(stage/10))
+	if beginruntimermax<1 then beginruntimermax=1 end
+
+
 	fire=0	
 	rounds={}
 	nmerounds={}	
@@ -463,6 +487,7 @@ function initialisestage()
 	nmewavenmes=0
 	respawndelay=5
 	triedcapturethisstage=false
+	numattackers=numattackersmax
 
 	local nmex=12
 	local nmey=8
@@ -502,8 +527,8 @@ function buildstagenmewaves(wav)
 		if wav[2][ntindex]==3 then hp=2 else hp=1 end
 		
 		for nw=1, wav[1] do
-			--nme={x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wav[2][ntindex],t=1,ph=0,sw=flr(rnd(2))*2-1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=hp,path=wav[3][ptindex],hascapture=false,index=1,isimmortal=false}
-			add(wavset,{x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wav[2][ntindex],t=1,ph=0,sw=flr(rnd(2))*2-1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=hp,path=wav[3][ptindex],hascapture=false,index=1,isimmortal=false})
+			add(wavset,{x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wav[2][ntindex],t=1,ph=0,sw=flr(rnd(2))*2-1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=hp,
+				path=wav[3][ptindex],hascapture=false,index=1,isimmortal=false,hasfired=false})
 			
 			ntindex+=1
 			ptindex+=1
@@ -531,7 +556,7 @@ function resetvars()
 	rectqueue={}	
 	swapgamephase=6
 	endofstage=false
-	numattackers=2
+	numattackers=0
 	cycleflag=false
 	capturesprt=nil	
 end
@@ -796,7 +821,7 @@ end
 function prepwaves()
 	pausetimer-=0.1
 	if pausetimer<=0 then
-		wavetimer-=0.35
+		wavetimer-=wavetimerdelta
 		if wavetimer<=0 and wavecounter<=#nmewavequeue then	
 			local wave=nmewavequeue[wavecounter]
 			if wave[2] ~= nil and #wave[2]>0 then	

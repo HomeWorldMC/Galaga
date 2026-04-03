@@ -22,9 +22,6 @@ function initialiseconstants()
     }
 
     pi=3.141592
-	logfile="log.txt"
-	printh("","log.txt",true)
-
 	sp={x=0,y=0,hp=1,typ=3}
 
     typ={3,1,1,2,2}
@@ -39,14 +36,17 @@ function initialiseconstants()
 	playerexplosionframes={115,117,119,121}
 	explosionspd=0.4	
 	stageiconsprites={8,9,10,11,12,13}	
+
 	nmetype1frames={32,33}
 	nmetype2frames={40,41}
 	nmetype3frames={48,49,56,57}
+	
 	nmetypeattframes={{33,34,35,36,37,38,39},{41,42,43,44,45,46,47},{48,50,51,52,53,54,55},{56,58,59,60,61,62,63}}
 	nmeanimspd=0.035
 	nmexmovespd=0.15
-	nmeymovespd=0.85
+	
 	missilemovespd=1.55
+	wavetimerdelta=0.35
 
 	xoffset={5,5,8,8,8,8}
 

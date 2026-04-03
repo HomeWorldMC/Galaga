@@ -7,7 +7,7 @@ function _init()
 
 	initialiseconstants()
 	
-	invince=true
+	invince=false
 	if invince then
 		maxrounds=5
 		musicstart=3
@@ -108,7 +108,7 @@ function _update60()
 		controls()	
 	else
 		getshieldnumbers()
-		if btnp(🅾️) and (gamephase==0 or gamephase==8) then
+		if (btnp(🅾️) or btnp(5,1)) and (gamephase==0 or gamephase==8) then
 			gamephase=1
 		end
 	end
@@ -324,7 +324,7 @@ function _draw()
 	--else
 	--	print("finished moving stuff",5,90,7) 
 	--end
-	if capturesprt~=nil then 
+	if capturesprt~=nil then
 		spr(capturesprt.f,capturesprt.x,capturesprt.y,1,1,capturesprt.flipx,capturesprt.flipy)
 	end
 
@@ -367,13 +367,13 @@ function doCSScreen()
 end
 
 function controls() 
-	if btn(⬅️) then
+	if btn(⬅️) or btn(0,1) then
 		if player.x>5 then
 			player.x-=shipspeedx
 		end
 	end
 	
-	if btn(➡️) then
+	if btn(➡️) or btn(1,1) then
 		if player.p>1 then
 			if player.x<109 then
 				player.x+=shipspeedx
@@ -386,7 +386,7 @@ function controls()
 		
 	end
 	
-	if btnp(❎) then
+	if btnp(❎) or btnp(4,1) then
 		if player.alive and rounds~=nil and gamephase~=1 and #rounds<maxrounds then
 			firelaser()
 		end

@@ -482,6 +482,7 @@ function docapture()
 					tractoron=false
 					resettractor()
 					del(nmescap,nme)
+					music(-1)
 				end
 			end
 		end

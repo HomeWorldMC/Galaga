@@ -23,6 +23,7 @@ function _init()
 	movetimers={}
 
 	-- Vars
+	playfield={}
 	blink=0	
 	firsttime=true
 	maxfreelives=#freelifescores
@@ -62,6 +63,8 @@ function _init()
 	shipspeedx=1.25
 	wavesetval=1
 	playfieldnmes=0
+	nmesinplay=0
+	lastnmesinplay=0
 	pausetimer=2
 	tractoron=false
 	tractorendtimer=10
@@ -83,6 +86,24 @@ function _init()
 end
 
 function _update60()
+	playfieldnmes=0
+
+	-- calculated enemy ships left in play
+	for r=1,#playfield do -- move enemy and roll deice for attack run
+		for c=1,#playfield[r] do
+			local pf=playfield[r][c]
+			if not pf.canwrite and pf.nme.mode==0 then	
+				playfieldnmes+=1
+			end
+		end
+	end
+
+	if nmescap~=nil and nmesatt~=nil then
+		lastnmesinplay = nmesinplay
+		nmesinplay = playfieldnmes + #nmescap + #nmesatt
+	end
+	-------------
+	
 	update_timers(1/30)
 	update_cycletimers()
 	update_movetimers(1)
@@ -194,8 +215,8 @@ function _update60()
 			--music(-1)
 		end
 
-		if #nmesatt==0 and #nmescap==0 and not tractoron then
-			if not nmealive and playfieldnmes<=0 then
+		if not tractoron then
+			if nmesinplay<=0 then
 				if player.alive then -- all waves and formations cleared. move to next stage
 					getshieldnumbers()
 					rounds={}
@@ -329,11 +350,10 @@ function _draw()
 	end
 
 	--print("gamephase:"..gamephase,5,60,7)
-	--print("#nmesatt:"..#nmesatt,5,70,7)
-	--print("#nmescap:"..#nmescap,5,80,7)
-	--print("nmecount:"..nmecount,5,90,7)
-	--print("nmealive:"..tostr(nmealive),5,100,7)
-	
+	--print("nmesinplay:"..nmesinplay,5,70,7)
+	--if nmesinplay~=lastnmesinplay then
+	--	print("GAP!!!!!!",5,80,7)
+	--end
 end
 
 function doCSScreen()
@@ -432,8 +452,6 @@ function initialisestage()
 	nmewavequeue={}
 	explosions={}
 	playerexplosion=0
-	nmealive=true
-	nmecount=40
 	beginruntimer=0
 	lastgamephase=2	
 	playfield={}
@@ -504,7 +522,6 @@ function resetvars()
 	nmescap={}
 	explosions={}
 	playerexplosion=0
-	nmecount=40
 	beginruntimer=0
 	playfield={}
 	triedcapturethisstage=false

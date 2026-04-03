@@ -37,8 +37,6 @@ end
 
 function playerdeath()
 	if not invince then
-		--printh("Player Died: #nmesatt="..#nmesatt..", #nmescap="..#nmescap..", player.lives="..player.lives..", nmealive="..tostr(nmealive)..", playfieldnmes="..playfieldnmes,"log.txt")
-		
 		player.alive=false
 		player.lives-=1
 		playerremains=1
@@ -54,8 +52,6 @@ function playerdeath()
 end
 
 function playercapture()
-	--printh("Player Captures: #nmesatt="..#nmesatt..", #nmescap="..#nmescap..", player.lives="..player.lives..", nmealive="..tostr(nmealive)..", playfieldnmes="..playfieldnmes,"log.txt")
-
 	player.alive=false
 	player.lives-=1
 	

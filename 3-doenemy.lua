@@ -4,7 +4,6 @@ function doplayfieldmovement()
 	end	
 
 	beginruntimer-=0.15	
-	nmecount=0	
 	
 	for r=1,#playfield do -- move enemy and roll deice for attack run
 		for c=1,#playfield[r] do
@@ -13,10 +12,9 @@ function doplayfieldmovement()
 			pf.x+=nmexmovespd
 			
 			if not pf.canwrite and pf.nme.mode==0 then	
-				nmecount+=1
 				pf.nme.x=pf.x
 				
-				if beginruntimer<0 and flr(rnd(nmecount*4)+1)==1 and #nmesatt<numattackers and player.alive and gamephase==3 and not disableplayer then
+				if beginruntimer<0 and flr(rnd(nmesinplay*4)+1)==1 and #nmesatt<numattackers and player.alive and gamephase==3 and not disableplayer then
 					beginruntimer=4
 					pf.nme.mode=1
 					pf.nme.ax=pf.nme.x
@@ -34,14 +32,11 @@ function doplayfieldmovement()
 					pf.canwrite=true
 					pf.holdslot=false
 
-					--playfieldnmes-=1						
 					sfx(6,3) -- nme attack run sound
 				end	
 			end
 		end
 	end	
-
-	playfieldnmes = nmecount
 	
 	if beginruntimer<=0 then
 		beginruntimer=4
@@ -49,20 +44,16 @@ function doplayfieldmovement()
 end
 
 function doplayfield()
-	nmealive=false
-	
 	for r=1,#playfield do
 		for c=1,#playfield[r] do
 			local pf=playfield[r][c]
 
 			if not pf.canwrite and pf.nme.mode~=2 then
-				nmealive=true
 				if #rounds > 0 and (pf.nme.mode==0 or pf.nme.mode==1) then
 					for rds in all(rounds) do
 						if checkrounds(pf.nme,rds,1) then
 							pf.nme.mode=2
 							pf.canwrite=true	
-							--playfieldnmes-=1
 						else
 							if pf.nme.hascapture then
 								if checkrounds({x=pf.nme.x,y=pf.nme.y-9,hp=1,typ=3},rds,1) then

@@ -362,11 +362,11 @@ function _draw()
 end
 
 function doCSScreen()
-	if musicstate>=5 then
+	if musicstate>=5 and musicstate<8 then
 		queue_prt("number of hits ", 30,63,textcol)
 	end
 
-	if musicstate>=6 then
+	if musicstate>=6 and musicstate<8 then
 		if stagekills==40 then
 			queue_prt("perfect !",46,49,8)
 		end

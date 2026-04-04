@@ -33,7 +33,7 @@ function initialiseconstants()
 	fieldboundmin=2
 	fieldboundmax=120	
 	explosionsframes={3,4,5,6,7}
-	playerexplosionframes={115,117,119,121}
+	playerexplosionframes={144,146,148,152}
 	explosionspd=0.4	
 	stageiconsprites={8,9,10,11,12,13}	
 

@@ -516,10 +516,7 @@ function buildstagenmewaves(wav)
 	ptindex=1
 
 	if wav[1]==1 then nw=1 else nw=2 end
-
-	for i=1,(8/wav[1]) do			
-		
-		
+	for i=1,(8/wav[1]) do		
 		for nw=1, wav[1] do
 			if wav[2][ntindex]==3 then hp=2 else hp=1 end
 			add(wavset,{x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wav[2][ntindex],t=1,ph=0,sw=flr(rnd(2))*2-1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=hp,
@@ -742,12 +739,6 @@ function dorecapture(nme)
 	move(2,{x=player.x,y=player.y},{x=60,y=116},player)
 end
 
---function queue_rect(x1,y1,x2,y2,col)
---	add(rectqueue, {
---		x1=x1,y1=y1,x2=x2,y2=y2,col=col
---	})
---end
-
 function queue_spr(n, x, y, w, h, flip_x, flip_y)
   add(drawqueue, {
     n=n, x=x, y=y,
@@ -790,25 +781,18 @@ function flush_printq()
   printqueue = {}
 end
 
---function flush_rectq()
---	for r in all(rectqueue) do
---		rect(r.x1,r.y1,r.x2,r.y2,r.col)
---	end
---	rectqueue = {}
---end
-
 function startscreen()
 	local ymov=0
 
 	if gamephase==8 then
-		ymov=46
+		ymov=42
 	end
 
-	queue_sspr(24, 32, 64, 24, 32, 20+ymov, 64,24)
+	queue_sspr(24, 32, 72, 24, 28, 20+ymov, 72,24)
 
-	print("rEMADE",49,39+ymov,13)
-	print("bY",58,45+ymov,13)
-	print("tEX",67,45+ymov,13)
+	--print("rEMADE",71,36+ymov,13)
+	print("bY",70,35+ymov,13)
+	print("tEX",79,35+ymov,13)
 	if gamephase==0 or gamephase==8 then
 		if firsttime then
 			print("[press start to play]", 22,113,textcol)

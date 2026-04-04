@@ -33,7 +33,7 @@ function doplayfieldmovement()
 					pf.canwrite=true
 					pf.holdslot=false
 
-					sfx(6,3) -- nme attack run sound
+					sfx(6,2) -- nme attack run sound
 				end	
 			end
 		end
@@ -48,25 +48,25 @@ function doplayfield()
 	for r=1,#playfield do
 		for c=1,#playfield[r] do
 			local pf=playfield[r][c]
-
-			if not pf.canwrite and pf.nme.mode~=2 then
-				if #rounds > 0 and (pf.nme.mode==0 or pf.nme.mode==1) then
+			local nme=pf.nme
+			if not pf.canwrite and nme.mode~=2 then
+				if #rounds > 0 and (nme.mode==0 or nme.mode==1) then
 					for rds in all(rounds) do
 						if checkrounds(pf.nme,rds,1) then
-							pf.nme.mode=2
+							nme.mode=2
 							pf.canwrite=true	
 						else
-							if pf.nme.hascapture then
-								if checkrounds({x=pf.nme.x,y=pf.nme.y-9,hp=1,typ=3},rds,1) then
-									pf.nme.hascapture=false
+							if nme.hascapture then
+								if checkrounds({x=nme.x,y=nme.y-9,hp=1,typ=3},rds,1) then
+									nme.hascapture=false
 								end
 							end	
 						end
 					end
 				end
-				drawsprite(pf.nme,false)
-				if pf.nme.hascapture then
-					queue_spr(23, pf.nme.x, pf.nme.y-9, 1, 1, false, false)
+				if nme.mode==0 then drawsprite(nme,false) end
+				if nme.hascapture then
+					queue_spr(23, nme.x, nme.y-9, 1, 1, false, false)
 				end
 			end
 		end
@@ -134,7 +134,9 @@ function doattacking()
 				sfx(1,1) -- nme explode sound
 				player.score+=(nmescores[nmeatt.typ]*4)
 				add(explosions,{x=nmeatt.x,y=nmeatt.y,t=1})
+				nmeatt.mode=2
 				del(nmesatt,nmeatt)
+				
 				freelifecheck()	
 			end		
 			
@@ -142,6 +144,7 @@ function doattacking()
 				for r in all(rounds) do
 					if checkrounds(nmeatt,r,4) then
 						del(nmesatt,nmeatt)
+						nmeatt.mode=2
 						if nmeatt.hascapture then
 							dorecapture(nmeatt)
 						end
@@ -156,11 +159,14 @@ function doattacking()
 					end
 				end
 			end
-				
-			drawrotatesprite(ang,nmeatt.x,nmeatt.y,nmeatt)
-			if nmeatt.hascapture then
-				queue_spr(23, nmeatt.x+1, nmeatt.y-9, 1, 1, false, false)
-			end
+			
+			if nmeatt.mode~=2 then 
+				--queue_prt(nmeatt.mode,nmeatt.x,nmeatt.y-4,7)
+				drawrotatesprite(ang,nmeatt.x,nmeatt.y,nmeatt) 
+				if nmeatt.hascapture then
+					queue_spr(23, nmeatt.x+1, nmeatt.y-9, 1, 1, false, false)
+				end
+			end			
 		end	
 	end
 end
@@ -301,7 +307,7 @@ function dowave()
 			if nme.index==maxnodes then
 				if not ischallengingstage then
 					slot=findemptyslot(nme.typ)
-					
+
 					nme.col=slot.col
 					nme.row=slot.row
 					tonode={x=slot.x,y=slot.y}
@@ -355,14 +361,16 @@ function dowave()
 				slot.holdslot=false
 				playfieldnmes+=1
 			else
-			
+				nme.mode=2
 			end
 
 			del(twave,nme)
 			nmewavenmes-=1
 			nme.hasfired=false
 		end
-		
+
+		--queue_prt(nme.hp,nme.x,nme.y-4,7)
+
 		if #rounds > 0 and nme.mode==3 then
 			for r in all(rounds) do
 				if checkrounds(nme,r,1) then
@@ -375,14 +383,14 @@ function dowave()
 				end
 			end
 		end
-		if stage>1 then
-			if not ischallengingstage and not nme.hasfired then
-				doenemyfireroll(nme,false,20,60)
-			end
-		end
-
+		
 		if nme.mode==3 then
 			drawrotatesprite(nme.ph,nme.x,nme.y,nme)
+			if stage>1 then
+				if not ischallengingstage and not nme.hasfired then
+					doenemyfireroll(nme,false,20,60)
+				end
+			end
 		end	
 	end
 end
@@ -459,7 +467,7 @@ function docapture()
 					nme.index=1
 
 					playfieldnmes+=1
-				
+					resettractor()
 					del(nmescap,nme)
 				end
 			else
@@ -469,13 +477,12 @@ function docapture()
 		else			
 			nme.index=7
 			tractoron=true
-			musicswitch=true
+			--musicswitch=true
 		end
 
 		if #rounds > 0 then
 			for r in all(rounds) do
-				if checkrounds(nme,r,4) and not disableplayer and not nme.isimmortal then
-					tractoron=false
+				if checkrounds(nme,r,4) and not disableplayer and not nme.isimmortal then					
 					resettractor()
 					del(nmescap,nme)
 					music(-1)

@@ -14,7 +14,6 @@ function move(set, startp, endp, obj,callback)
 	add(movetimers[set],{sx=startp.x, sy=startp.y, ex=endp.x, ey=endp.y, obj=obj, cb=callback})
 end
 
--- { { {},{},{} }, { {},{},{} }}
 
 function update_timers(dt)
 	for t in all(timers) do

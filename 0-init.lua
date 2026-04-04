@@ -2,15 +2,13 @@ function _init()
 	initialiseconstants()
 	
 	invince=false
-	if invince then
-		maxrounds=5
-		musicstart=3
-	else
-		maxrounds=2
-		musicstart=1
-		poke(0x5f5c,255)
-		poke(0x5f5d,255)
-	end
+	--maxrounds=5
+	--musicstart=3
+
+	maxrounds=2
+	musicstart=1
+	poke(0x5f5c,255)
+	poke(0x5f5d,255)
 		
 	timers={}
 	cycletimers={}
@@ -71,7 +69,7 @@ function _init()
 	tractoron=false
 	tractorendtimer=10
 	tractorfx=8
-	musicswitch=false
+	--musicswitch=false
 	challengingmusicswitch=false
 	stagesfx=false
 	disableplayer=false	
@@ -113,10 +111,8 @@ function _update60()
 		end
 	end
 
-	if nmescap~=nil and nmesatt~=nil then
-		lastnmesinplay = nmesinplay
-		nmesinplay = playfieldnmes + #nmescap + #nmesatt
-	end
+	lastnmesinplay = nmesinplay
+	nmesinplay = playfieldnmes + #nmescap + #nmesatt
 	-------------
 
 	update_timers(1/30)
@@ -221,14 +217,6 @@ function _update60()
 		end
 	elseif gamephase==3 then --- formation attacks
 		maingame()
-		if musicswitch then
-			music(tractorfx)
-			musicswitch=false
-		end
-
-		if not tractoron then
-			--music(-1)
-		end
 
 		if not tractoron then
 			if nmesinplay<=0 then
@@ -260,6 +248,9 @@ function _update60()
 					end)
 				end
 			end
+		--else
+			--queue_prt("doing tractor music",5,100,7)
+			
 		end
 	elseif gamephase==4 then --enemies cleared
 		if not disableplayer then
@@ -279,6 +270,7 @@ function _update60()
 		end
 	elseif gamephase==5 then -- player dead
 		maingame()
+
 		if player.lives<0 then
 			gamephase=6
 			swapgamephase=8
@@ -317,7 +309,7 @@ function _update60()
 			if ischallengingstage then	
 				music(4)
 			else
-				sfx(5,3)
+				sfx(5,2)
 			end
 			stagesfx=false
 		end
@@ -341,7 +333,7 @@ function _draw()
 
 	flush_drawq()
 	flush_drawqt()
-	flush_rectq()
+	--flush_rectq()
 	flush_printq()
 
 	if gamephase==0 or gamephase==1 or gamephase==8 then
@@ -354,8 +346,8 @@ function _draw()
 		spr(capturesprt.f,capturesprt.x,capturesprt.y,1,1,capturesprt.flipx,capturesprt.flipy)
 	end
 
-	--print("nmeymovespd:"..nmeymovespd,5,70,7)
-	--print("maxfiresperwave:"..maxfiresperwave,5,80,7)
+	--print("#rounds:"..#rounds,5,70,7)
+	--print("stat(24):"..stat(24),5,80,7)
 	--print("nmeroundsmax:"..nmeroundsmax,5,90,7)
 	--print("beginruntimermax:"..beginruntimermax,5,100,7)
 	--print("numattackersmax:"..numattackersmax,5,110,7)
@@ -427,7 +419,7 @@ function freelifecheck()
 	if freelivesgiven <= maxfreelives and player.score>=freelifescores[freelivesgiven] then
 		player.lives+=1
 		freelivesgiven+=1
-		sfx(7,0) --free life sound
+		sfx(7,1) --free life sound
 	end
 end
 
@@ -518,15 +510,18 @@ function buildstagenmewaves(wav)
 	local wavset={}
 	local hp=1
 	--local nme
+	-- wav = {2,{3,1},{"10a","10b"}}
 
 	ntindex=1
 	ptindex=1
 
 	if wav[1]==1 then nw=1 else nw=2 end
+
 	for i=1,(8/wav[1]) do			
-		if wav[2][ntindex]==3 then hp=2 else hp=1 end
+		
 		
 		for nw=1, wav[1] do
+			if wav[2][ntindex]==3 then hp=2 else hp=1 end
 			add(wavset,{x=0,y=0,ax=0,ay=0,lax=0,lay=0,f=1,st=0,dir=0,typ=wav[2][ntindex],t=1,ph=0,sw=flr(rnd(2))*2-1,col=0,row=0,mode=3,timer=3,dr=0.5,hp=hp,
 				path=wav[3][ptindex],hascapture=false,index=1,isimmortal=false,hasfired=false})
 			
@@ -536,6 +531,19 @@ function buildstagenmewaves(wav)
 			if ptindex>#wav[3] then ptindex=1 end
 		end
 	end
+
+	-------------
+	
+	--local nw=wav[1]
+	--local nt=#wav[2]
+	--local np=#wav[3]
+--
+	--if num
+
+	-- 1 wav, 1 type, 1 pattern
+	-- 1 wav, 2 types, 1 pattern
+	-- 2 wav, 2 types, 2 patterns 
+
 	add(nmewavequeue, {wav[1],wavset})
 end
 
@@ -631,10 +639,12 @@ function resettractor()
 	trdir=1
 	trmov=5
 	tractorendtimer=10
+	tractoron=false
 end
 
 function dotractorbeam(offx,offy,nme)
-	tractorfx=8
+	if stat(24)~= tractorfx then music(tractorfx) end
+
 	queue_sspr(0, 32, 24, trmov, offx, offy, 24, trmov)
 	
 	tcols={1,3,12}
@@ -646,17 +656,18 @@ function dotractorbeam(offx,offy,nme)
 
 	pal(2, tcols[ ind   %3+1],1)
 	pal(11,tcols[(ind+1)%3+1],1)
-	pal(15,tcols[(ind+2)%3+1],1)	
+	pal(15,tcols[(ind+2)%3+1],1)
 
 	trmov+=0.35*trdir
 	if trmov>40 then 		
 		tractorendtimer-=0.075
 		if tractorendtimer<0 then
 			tractorfx=10
-			musicswitch=true
+			
 			trdir=-1 
 			trmov=40
 		else
+			tractorfx=8
 			trmov=41
 		end	
 
@@ -731,11 +742,11 @@ function dorecapture(nme)
 	move(2,{x=player.x,y=player.y},{x=60,y=116},player)
 end
 
-function queue_rect(x1,y1,x2,y2,col)
-	add(rectqueue, {
-		x1=x1,y1=y1,x2=x2,y2=y2,col=col
-	})
-end
+--function queue_rect(x1,y1,x2,y2,col)
+--	add(rectqueue, {
+--		x1=x1,y1=y1,x2=x2,y2=y2,col=col
+--	})
+--end
 
 function queue_spr(n, x, y, w, h, flip_x, flip_y)
   add(drawqueue, {
@@ -779,12 +790,12 @@ function flush_printq()
   printqueue = {}
 end
 
-function flush_rectq()
-	for r in all(rectqueue) do
-		rect(r.x1,r.y1,r.x2,r.y2,r.col)
-	end
-	rectqueue = {}
-end
+--function flush_rectq()
+--	for r in all(rectqueue) do
+--		rect(r.x1,r.y1,r.x2,r.y2,r.col)
+--	end
+--	rectqueue = {}
+--end
 
 function startscreen()
 	local ymov=0
@@ -826,6 +837,7 @@ function maingame()
 	if gamephase~=5 then
 		doplayer()
 	end
+
 	doexplosions()
 	doplayerexplosion()
 

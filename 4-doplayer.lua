@@ -6,12 +6,12 @@ function doplayer()
 				if not disableplayer then
 					if doboxcollision(player.x+3,player.y,r.x-1,r.y-2,8) then
 						playerexplosion={x=player.x+3,y=player.y,t=1}
-						sfx(2,2)  -- player explode sound
+						sfx(2,1)  -- player explode sound
 						player.p=1
 						del(nmerounds,r)
 					elseif doboxcollision(player.x-4,player.y,r.x-1,r.y-2,8) then
 						playerexplosion={x=player.x-4,y=player.y,t=1}
-						sfx(2,2)  -- player explode sound
+						sfx(2,1)  -- player explode sound
 						player.p=1
 						del(nmerounds,r)
 					end
@@ -42,7 +42,7 @@ function playerdeath()
 		playerremains=1
 
 		playerexplosion={x=player.x,y=player.y,t=1}
-		sfx(2,2)  -- player explode sound
+		sfx(2,1)  -- player explode sound
 		
 		if player.lives<0 then
 			gameover=true

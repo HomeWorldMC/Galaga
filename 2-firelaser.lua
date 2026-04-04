@@ -2,7 +2,7 @@ function firelaser()
 	for i=0, player.p-1 do
 		add(rounds,{x=player.x+xo[player.p+i],y=player.y})
 	end
-	sfx(0,2)
+	sfx(0,3)
 end
 
 function animateplayerrounds(rnds,sp,dir)

@@ -634,13 +634,6 @@ function flippath(path)
 	return flippedpath
 end
 
-function test()
-	for i=1,6,2 do
-		print(i)
-	end
-
-end
-
 function resettractor()
 	tractorfx=8
 	trdir=1
@@ -800,9 +793,8 @@ function startscreen()
 
 	queue_sspr(24, 32, 88, 24, 20, 20+ymov, 88,24)
 
-	--print("a gALAGA rEMAKE",57,20+ymov,3)
-	--print("bY",70,35+ymov,5)
-	--print("tEXo",79,35+ymov,5)
+	print("bY",62,35+ymov,5)
+	print("tEX",71,35+ymov,5)
 	if gamephase==0 or gamephase==8 then
 		if firsttime then
 			print("[press start to play]", 22,113,textcol)

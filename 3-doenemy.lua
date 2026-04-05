@@ -302,27 +302,47 @@ function dowave()
 		
 		if nme.st==0 then
 			nme.st=1			
-			fromnode=path[nme.index]
+			fromnode={path[nme.index],path[nme.index+1]}
 			
-			if nme.index==maxnodes then
+			--if nme.index==maxnodes-2 then
+			--	if not ischallengingstage then
+			--		slot=findemptyslot(nme.typ)
+--
+			--		nme.col=slot.col
+			--		nme.row=slot.row
+			--		tonode={x=slot.x,y=slot.y}
+			--	else
+			--		tonode={path[nme.index],path[nme.index+1]}
+			--	end
+			--else 
+			--	tonode={path[nme.index+2],path[nme.index+3]}
+			--end
+
+			if nme.index<=maxnodes-2 then
+				tonode={path[nme.index+2],path[nme.index+3]}
+			else
 				if not ischallengingstage then
 					slot=findemptyslot(nme.typ)
 
 					nme.col=slot.col
 					nme.row=slot.row
-					tonode={x=slot.x,y=slot.y}
+					tonode={slot.x,slot.y}
 				else
-					tonode=path[nme.index]
+					tonode={path[nme.index],path[nme.index+1]}
 				end
-			else 
-				tonode=path[nme.index+1]
 			end
+
+			--printh("fromnode:"..tostr(fromnode),"log.txt")
+			--printh("tonode:"..tostr(tonode),"log.txt")
+			--printh("#fromnode:"..tostr(#fromnode),"log.txt")
+			--printh("#tonode:"..tostr(#tonode),"log.txt")
+			--printh("-------------","log.txt")
 			
-			nme.ph = atan2( (fromnode.x-tonode.x), (fromnode.y-tonode.y) )
-			nme.x=fromnode.x
-			nme.y=fromnode.y
-			nme.ax=tonode.x
-			nme.ay=tonode.y
+			nme.ph = atan2( (fromnode[1]-tonode[1]), (fromnode[2]-tonode[2]) )
+			nme.x=fromnode[1]
+			nme.y=fromnode[2]
+			nme.ax=tonode[1]
+			nme.ay=tonode[2]
 		else 
 			dx=nme.ax-nme.x
 			dy=nme.ay-nme.y
@@ -339,7 +359,7 @@ function dowave()
 		disttonext = (abs(nme.x-nme.ax)+abs(nme.y-nme.ay)) 
 
 		if disttonext<nmewavespd then
-			nme.index+=1
+			nme.index+=2
 			nme.st=0
 		end
 		
@@ -413,24 +433,28 @@ function docapture()
 		path=paths[8]
 		maxnodes=#path
 
-		if nme.index~=6 then
+		if nme.index==11 then
+			nme.index+=2
+			tractoron=true
+			--musicswitch=true
+		else
 			if not tractoron then
 				if nme.st==0 then
 					nme.st=1			
-					fromnode={x=nme.x,y=nme.y}
-					
-					if nme.index==maxnodes then
+					fromnode={nme.x,nme.y}
+
+					if nme.index<=maxnodes-2 then
+						tonode={path[nme.index+2],path[nme.index+3]}
+					else
 						slot=playfield[nme.row][nme.col]
-						tonode={x=slot.x,y=slot.y}				
-					else 
-						tonode=path[nme.index+1]
+						tonode={slot.x,slot.y}				
 					end
 					
-					nme.ph = atan2( (fromnode.x-tonode.x), (fromnode.y-tonode.y) )
-					nme.x=fromnode.x
-					nme.y=fromnode.y
-					nme.ax=tonode.x
-					nme.ay=tonode.y
+					nme.ph = atan2( (fromnode[1]-tonode[1]), (fromnode[2]-tonode[2]) )
+					nme.x=fromnode[1]
+					nme.y=fromnode[2]
+					nme.ax=tonode[1]
+					nme.ay=tonode[2]
 				else 
 					dx=nme.ax-nme.x
 					dy=nme.ay-nme.y
@@ -447,7 +471,7 @@ function docapture()
 				disttonext = (abs(nme.x-nme.ax)+abs(nme.y-nme.ay)) 
 
 				if disttonext<nmewavespd then
-					nme.index+=1
+					nme.index+=2
 					nme.st=0
 				end
 				
@@ -474,10 +498,6 @@ function docapture()
 				nme.ph=0.25	
 				dotractorbeam(nme.x-7,nme.y+8,nme)
 			end					
-		else			
-			nme.index=7
-			tractoron=true
-			--musicswitch=true
 		end
 
 		if #rounds > 0 then

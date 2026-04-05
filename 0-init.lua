@@ -36,14 +36,6 @@ function _init()
 		flipy=false
 	}
 
-	-- difficulty level vars
-	--nmeymovespd=0.85 -- faster attacking (increase by 0.1 every 10 rounds)
-	--nmeroundsmax=3 -- max number of rounds nmes can have on screen at once (increase by 1 every 4 stages, to a max of 8)
-	--beginruntimermax=4 -- time between successive attacks - diving or capturing (currently using this sum : 4-(flr(stage/10)))
-	--numattackersmax=2 -- total number of attackers that can be on screen
-
-
-
 	nmewavespd=0
 	wavetimer=3
 	
@@ -149,9 +141,9 @@ function _update60()
 		-- check if this stage is a challenging stage
 		if (stage+1)%4==0 then
 			ischallengingstage=true
-			nmewavespd=1.30	
+			nmewavespd=1.3
 		else
-			ischallengingstage=false
+			ischallengingstage=false 
 			nmewavespd=2
 		end
 
@@ -625,10 +617,28 @@ end
 
 function flippath(path)
 	local flippedpath={}
-	for i in all(path) do
-		add(flippedpath,{x=128-i.x,y=i.y})
+	--for i in all(path) do
+	--	add(flippedpath,{x=128-i.x,y=i.y})
+	--end
+	local x
+	local y
+
+	for i=1,#path,2 do
+		x=128-path[i]
+		y=path[i+1]
+		add(flippedpath,x)
+		add(flippedpath,y)
+		
 	end
+	
 	return flippedpath
+end
+
+function test()
+	for i=1,6,2 do
+		print(i)
+	end
+
 end
 
 function resettractor()
@@ -656,16 +666,16 @@ function dotractorbeam(offx,offy,nme)
 	pal(15,tcols[(ind+2)%3+1],1)
 
 	trmov+=0.35*trdir
-	if trmov>40 then 		
+	if trmov>39 then 		
 		tractorendtimer-=0.075
 		if tractorendtimer<0 then
 			tractorfx=10
 			
 			trdir=-1 
-			trmov=40
+			trmov=39
 		else
 			tractorfx=8
-			trmov=41
+			trmov=40
 		end	
 
 		if dorectoverlapcollision(player.x,player.y,offx+6,offy,6,8,10,39) and not disableplayer and tractoron and player.alive then
@@ -788,11 +798,11 @@ function startscreen()
 		ymov=42
 	end
 
-	queue_sspr(24, 32, 72, 24, 28, 20+ymov, 72,24)
+	queue_sspr(24, 32, 88, 24, 20, 20+ymov, 88,24)
 
-	--print("rEMADE",71,36+ymov,13)
-	print("bY",70,35+ymov,13)
-	print("tEX",79,35+ymov,13)
+	--print("a gALAGA rEMAKE",57,20+ymov,3)
+	--print("bY",70,35+ymov,5)
+	--print("tEXo",79,35+ymov,5)
 	if gamephase==0 or gamephase==8 then
 		if firsttime then
 			print("[press start to play]", 22,113,textcol)
